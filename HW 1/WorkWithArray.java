@@ -7,18 +7,26 @@ public class WorkWithArray {
     private static int[] innerArray;
     private static Random generator = new Random();
 
+    public static int[] getInnerArray() {
+        return innerArray;
+    }
+
     public static void setInnerArray(int[] innerArray) {
+        if ((innerArray == null) || (innerArray.length == 0)) {
+            System.out.println("Inner array is empty!");
+            return;
+        }
         WorkWithArray.innerArray = innerArray;
     }
 
     public static void main(String[] args) {
         initRandomArray(15);
         printArray();
-        int key = innerArray[(innerArray.length-1) / 2];
+        int key = innerArray[(innerArray.length - 1) / 2];
         System.out.println("Set key = " + key);
-        quickSort(0, innerArray.length-1);
+        quickSort(innerArray);
         printArray();
-        binarySearch(innerArray, 0, innerArray.length-1, key);
+        binarySearch(innerArray, key);
     }
 
     public static void initRandomArray(int length) {
@@ -37,7 +45,13 @@ public class WorkWithArray {
         System.out.println(innerArray[length - 1]);
     }
 
-    public static void quickSort(int first, int last){
+    public static int[] quickSort(int[] array) {
+        setInnerArray(array);
+        quickSort(0, innerArray.length - 1);
+        return getInnerArray();
+    }
+
+    private static void quickSort(int first, int last) {
         int i = first;
         int j = last;
         if (i >= j)
@@ -61,15 +75,20 @@ public class WorkWithArray {
             }
         }
         quickSort(first, cur);
-        quickSort(cur+1, last);
+        quickSort(cur + 1, last);
     }
 
-    public static void binarySearch(int[] array, int fist, int last, int key) {
+
+    public static int binarySearch(int[] array, int key) {
+        setInnerArray(array);
+        int fist = 0;
+        int last = innerArray.length - 1;
         int position;
+
         position = (fist + last) / 2;
 
-        while ((array[position] != key) && (fist <= last)) {
-            if (array[position] > key) {
+        while ((innerArray[position] != key) && (fist <= last)) {
+            if (innerArray[position] > key) {
                 last = position - 1;
             } else {
                 fist = position + 1;
@@ -82,6 +101,7 @@ public class WorkWithArray {
         } else {
             System.out.println("Key not in this array.");
         }
-    }
 
+        return position;
+    }
 }

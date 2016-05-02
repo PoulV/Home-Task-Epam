@@ -1,2 +1,0 @@
-java -classpath . WorkWithArray
-Pause

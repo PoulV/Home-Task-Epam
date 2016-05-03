@@ -10,7 +10,7 @@ public class Pavel_Vasilev_QuickSort_BinarySearch {
         int key = 45;
         int position;
 
-        quickSort(array);
+        array = quickSort(array);
         printArray(array);
         System.out.println("key = " + key);
         position = binarySearch(array, key);
@@ -24,12 +24,12 @@ public class Pavel_Vasilev_QuickSort_BinarySearch {
         }
         System.out.println(array[length - 1]);
     }
-
-    public static void quickSort(int[] array) {
+    public static int[] quickSort(int[] array) {
         if ((array == null) || (array.length == 0)) {
             throw new RuntimeException("Array is empty!");
         }
         quickSort(0, array.length - 1, array);
+        return array;
     }
 
     private static void quickSort(int first, int last, int[] array) {
@@ -63,25 +63,32 @@ public class Pavel_Vasilev_QuickSort_BinarySearch {
         if ((array == null) || (array.length == 0)) {
             throw new RuntimeException("Array is empty!");
         }
-        int fisrt = 0;
+        int first = 0;
         int last = array.length - 1;
         int position;
+        int result = -1;
 
-        position = (fisrt + last) / 2;
+        position = (first + last) / 2;
 
-        while (last - fisrt > 1) {
-            if (array[position] < key) {
-                fisrt = position + 1;
-            } else {
-                last = position - 1;
+        while (last - first >= 1) {
+            if (array[position] == key) {
+                result = position;
             }
-            position = (fisrt + last) / 2;
+            if (array[position] < key) {
+                first = position + 1;
+            } else {
+                last = position;
+            }
+            position = (first + last) / 2;
         }
 
-        if (array[position] != key) {
-            return -1;
-        } else {
-            return position;
+        if (result == -1) {
+            if (array[position] != key) {
+                result = -1;
+            } else {
+                result = position;
+            }
         }
+        return result;
     }
 }

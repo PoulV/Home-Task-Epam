@@ -1,5 +1,8 @@
 package com.epam.trenings;
 
+import com.epam.trenings.actions.AbstractSortAndSearch;
+import com.epam.trenings.actions.CocktailSortAndInterpolationSearch;
+import com.epam.trenings.actions.QuickSortAndBinarySearch;
 import java.util.Random;
 
 /**
@@ -10,42 +13,25 @@ public class Solution {
     private static final int ARRAY_SIZE = 18;
 
     public static void main(String[] args) {
-        int[] array = getRandomArray(ARRAY_SIZE);
+
+        AbstractSortAndSearch cocktailSortAndInterpolationSearch = new CocktailSortAndInterpolationSearch();
+        AbstractSortAndSearch quickSortAndBinarySearch = new QuickSortAndBinarySearch();
+        int[] array = Utils.getRandomArray(ARRAY_SIZE);
         int key = array[generator.nextInt(ARRAY_SIZE)];
 
-        int position;
-        AbstractSortAndSearch cocktailSort_interpolationSearch = new CocktailSort_InterpolationSearch();
-        AbstractSortAndSearch quickSort_binarySearch = new QuickSort_BinarySearch();
+        testSortAndSearch(cocktailSortAndInterpolationSearch, array, key);
+        testSortAndSearch(quickSortAndBinarySearch, array, key);
+    }
 
-        System.out.println("CocktailSort_InterpolationSearch");
-        array = cocktailSort_interpolationSearch.sort(array);
-        printArray(array);
+    private static void testSortAndSearch(AbstractSortAndSearch sortAndSearch, int[] array, int key) {
+        int position;
+
+        System.out.println(sortAndSearch.getClass().toString());
+        array = sortAndSearch.sort(array);
+        Utils.printArray(array);
         System.out.println("key = " + key);
-        position = cocktailSort_interpolationSearch.search(array, key);
+        position = sortAndSearch.search(array, key);
         System.out.println("Position key = " + position);
         System.out.println();
-
-        System.out.println("QuickSort_BinarySearch");
-        array = quickSort_binarySearch.sort(array);
-        printArray(array);
-        System.out.println("key = " + key);
-        position = quickSort_binarySearch.search(array, key);
-        System.out.println("Position key = " + position);
-    }
-
-    public static void printArray(int[] array) {
-        int length = array.length;
-        for (int i = 0; i < length - 1; i++) {
-            System.out.print(array[i] + ", ");
-        }
-        System.out.println(array[length - 1]);
-    }
-
-    public static int[] getRandomArray(int length) {
-        int[] resultArray = new int[length];
-        for (int i = 0; i < length; i++) {
-            resultArray[i] = generator.nextInt(100);
-        }
-        return resultArray;
     }
 }

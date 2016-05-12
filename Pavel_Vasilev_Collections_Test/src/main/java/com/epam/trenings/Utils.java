@@ -23,8 +23,8 @@ public class Utils {
     public static long randomAdditionTest(List<Integer> testedList, int count) {
         testedList.clear();
         long startTime = System.currentTimeMillis();
-        for (int i = 0; i < count-1; i++) {
-            testedList.add(generator.nextInt(i+1), 1);
+        for (int i = 0; i < count - 1; i++) {
+            testedList.add(generator.nextInt(i + 1), 1);
         }
         long result = System.currentTimeMillis() - startTime;
         return result;

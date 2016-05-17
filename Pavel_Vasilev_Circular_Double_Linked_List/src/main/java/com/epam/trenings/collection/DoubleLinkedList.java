@@ -1,16 +1,13 @@
-package com.epam.trenings.classes;
+package com.epam.trenings.collection;
 
-
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.Objects;
 
-/**
- * Created by Pol on 5/9/2016.
- */
 public class DoubleLinkedList<T extends Comparable<T>> implements Iterable<T>, IReversIterable<T> {
     private int size = 0;
     private Node<T> first;
     private Node<T> last;
+    private Integer countOfModification = 0;
 
     public T get(int index) {
         checkElementIndex(index);
@@ -19,6 +16,7 @@ public class DoubleLinkedList<T extends Comparable<T>> implements Iterable<T>, I
 
     public T set(int index, T element) {
         checkElementIndex(index);
+        countOfModification++;
         Node<T> x = node(index);
         T oldVal = x.item;
         x.item = element;
@@ -26,14 +24,14 @@ public class DoubleLinkedList<T extends Comparable<T>> implements Iterable<T>, I
     }
 
     public boolean add(T t) {
+        countOfModification++;
         final Node<T> locLast = last;
         final Node<T> newNode = new Node<>(locLast, t, null);
         last = newNode;
         if (locLast == null) {
             first = newNode;
             newNode.prev = newNode;
-        }
-        else {
+        } else {
             locLast.next = newNode;
             newNode.prev = locLast;
         }
@@ -59,47 +57,46 @@ public class DoubleLinkedList<T extends Comparable<T>> implements Iterable<T>, I
     }
 
     public T remove(int index) {
+        countOfModification++;
         checkElementIndex(index);
         return clearLink(node(index));
     }
 
-    private T clearLink(Node<T> x) {
-        // assert x != null;
-        final T element = x.item;
-        final Node<T> next = x.next;
-        final Node<T> prev = x.prev;
+    private T clearLink(Node<T> nodeForDelete) {
+        final T element = nodeForDelete.item;
+        final Node<T> next = nodeForDelete.next;
+        final Node<T> prev = nodeForDelete.prev;
 
         if (prev == last) {
             first = next;
         } else {
             prev.next = next;
-            x.prev = null;
+            nodeForDelete.prev = null;
         }
 
         if (next == first) {
             last = prev;
         } else {
             next.prev = prev;
-            x.next = null;
+            nodeForDelete.next = null;
         }
 
-        x.item = null;
+        nodeForDelete.item = null;
         size--;
         return element;
     }
 
 
-
-    void linkBefore(T t, Node<T> node) {
-        final Node<T> prev = node.prev;
+    void linkBefore(T valueForInsert, Node<T> targetNode) {
+        countOfModification++;
+        final Node<T> prev = targetNode.prev;
         final Node<T> locLast = last;
-        final Node<T> newNode = new Node<>(prev, t, node);
-        node.prev = newNode;
+        final Node<T> newNode = new Node<>(prev, valueForInsert, targetNode);
+        targetNode.prev = newNode;
         if (prev == null) {
             first = newNode;
             newNode.prev = locLast;
-        }
-        else
+        } else
             prev.next = newNode;
         size++;
     }
@@ -117,17 +114,14 @@ public class DoubleLinkedList<T extends Comparable<T>> implements Iterable<T>, I
         return size;
     }
 
-    private boolean isElementIndex(int index) {
-        return index >= 0 && index < size;
-    }
-
     private void checkElementIndex(int index) {
-        if (!isElementIndex(index))
+        if (index < 0 || index > size)
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
     }
 
 
     public void coctailSort() {
+        countOfModification++;
         if (size == 0) {
             throw new RuntimeException("List is empty!");
         }
@@ -172,19 +166,28 @@ public class DoubleLinkedList<T extends Comparable<T>> implements Iterable<T>, I
         private Node<T> prev;
         private int nextIndex;
         private int prevIndex = size;
+        private Integer exceptableCountModification = countOfModification;
 
 
-        MyItr(int index) {
-            next = (index == size) ? node(0) : node(index);
-            prev = (index == 0) ? node(size - 1) : node(index);
-            nextIndex = index;
+        MyItr(int startIndex) {
+            next = (startIndex == size) ? node(0) : node(startIndex);
+            prev = (startIndex == 0) ? node(size - 1) : node(startIndex);
+            nextIndex = startIndex;
         }
 
+        private void checkModification() {
+            if (exceptableCountModification != countOfModification)
+                throw new ConcurrentModificationException();
+        }
+
+        @Override
         public boolean hasNext() {
             return nextIndex < size;
         }
 
+        @Override
         public T next() {
+            checkModification();
             lastReturned = next;
             next = next.next;
             nextIndex++;
@@ -212,6 +215,7 @@ public class DoubleLinkedList<T extends Comparable<T>> implements Iterable<T>, I
 
         @Override
         public T prev() {
+            checkModification();
             lastReturned = prev;
             prev = prev.prev;
             prevIndex--;

@@ -1,9 +1,5 @@
-package com.epam.trenings.classes;
+package com.epam.trenings.collection;
 
-
-/**
- * Created by Pol on 5/9/2016.
- */
 public interface IReversIterable<T> {
     IReversIterator<T> reversIterator();
 }

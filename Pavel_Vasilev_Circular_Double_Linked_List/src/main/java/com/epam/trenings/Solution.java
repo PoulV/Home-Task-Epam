@@ -15,7 +15,7 @@ public class Solution {
 
         Utils.printList(myList, "Fisrt creation double linked list:");
 
-        myList.coctailSort();
+        myList.cocktailSort();
         Utils.printList(myList, "Sorted double linked list:");
 
         Utils.printReversList(myList, "Use reverse iterator");
@@ -27,7 +27,7 @@ public class Solution {
         Utils.printList(myList, "Double linked list with new element:");
 
         DoubleLinkedList<Integer> myRandomList = Utils.getRandomIntegerList(30);
-        myRandomList.coctailSort();
+        myRandomList.cocktailSort();
         Utils.printList(myRandomList, "Sorted random list of Integer:");
 
         try {
@@ -37,6 +37,13 @@ public class Solution {
         } catch (ConcurrentModificationException exception) {
             System.out.println("Catched ConcurrentModificationException!");
         }
+
+        myRandomList.map(new ITypeConverter<String, Integer>() {
+            @Override
+            public Integer aply(String element) {
+                return null;
+            }
+        });
 
 
     }

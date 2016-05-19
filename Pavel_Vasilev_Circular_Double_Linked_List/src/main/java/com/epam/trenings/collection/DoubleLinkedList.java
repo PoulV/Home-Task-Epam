@@ -1,12 +1,10 @@
 package com.epam.trenings.collection;
 
 import com.epam.trenings.ITypeConverter;
-import sun.org.mozilla.javascript.internal.Function;
-
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
-public class DoubleLinkedList<GENERAL_TYPE extends Comparable<GENERAL_TYPE>> implements Iterable<GENERAL_TYPE>, IReversIterable<GENERAL_TYPE> {
+public class DoubleLinkedList<GENERAL_TYPE extends Comparable> implements Iterable<GENERAL_TYPE>, IReversIterable<GENERAL_TYPE> {
     private int size = 0;
     private Node<GENERAL_TYPE> first;
     private Node<GENERAL_TYPE> last;
@@ -14,13 +12,13 @@ public class DoubleLinkedList<GENERAL_TYPE extends Comparable<GENERAL_TYPE>> imp
 
     public GENERAL_TYPE get(int index) {
         checkElementIndex(index);
-        return node(index).item;
+        return getNode(index).item;
     }
 
     public GENERAL_TYPE set(int index, GENERAL_TYPE element) {
         checkElementIndex(index);
         countOfModification++;
-        Node<GENERAL_TYPE> x = node(index);
+        Node<GENERAL_TYPE> x = getNode(index);
         GENERAL_TYPE oldVal = x.item;
         x.item = element;
         return oldVal;
@@ -45,7 +43,7 @@ public class DoubleLinkedList<GENERAL_TYPE extends Comparable<GENERAL_TYPE>> imp
         return true;
     }
 
-    Node<GENERAL_TYPE> node(int index) {
+    Node<GENERAL_TYPE> getNode(int index) {
         if (index < (size >> 1)) {
             Node<GENERAL_TYPE> x = first;
             for (int i = 0; i < index; i++)
@@ -62,7 +60,7 @@ public class DoubleLinkedList<GENERAL_TYPE extends Comparable<GENERAL_TYPE>> imp
     public GENERAL_TYPE remove(int index) {
         countOfModification++;
         checkElementIndex(index);
-        return clearLink(node(index));
+        return clearLink(getNode(index));
     }
 
     private GENERAL_TYPE clearLink(Node<GENERAL_TYPE> nodeForDelete) {
@@ -110,7 +108,7 @@ public class DoubleLinkedList<GENERAL_TYPE extends Comparable<GENERAL_TYPE>> imp
         if (index == size)
             add(element);
         else
-            linkBefore(element, node(index));
+            linkBefore(element, getNode(index));
     }
 
     public int getSize() {
@@ -173,8 +171,8 @@ public class DoubleLinkedList<GENERAL_TYPE extends Comparable<GENERAL_TYPE>> imp
 
 
         MyItr(int startIndex) {
-            next = (startIndex == size) ? node(0) : node(startIndex);
-            prev = (startIndex == 0) ? node(size - 1) : node(startIndex);
+            next = (startIndex == size) ? getNode(0) : getNode(startIndex);
+            prev = (startIndex == 0) ? getNode(size - 1) : getNode(startIndex);
             nextIndex = startIndex;
         }
 
@@ -238,11 +236,13 @@ public class DoubleLinkedList<GENERAL_TYPE extends Comparable<GENERAL_TYPE>> imp
         }
     }
 
-    public void map(ITypeConverter<T1 extends Comparable, Comparable> converter) {
-        DoubleLinkedList<?> resultDoubleLinkedList = new DoubleLinkedList<>();
-        for (GENERAL_TYPE element : this) {
-            resultDoubleLinkedList.add(converter.aply(element));
+    public DoubleLinkedList<Comparable> map(ITypeConverter converter) {
+        DoubleLinkedList<Comparable> resultDoubleLinkedList = new DoubleLinkedList<>();
+        for (Comparable element : this) {
+            Comparable result = converter.aply(element);
+            resultDoubleLinkedList.add(result);
         }
+        return resultDoubleLinkedList;
     }
 
 }

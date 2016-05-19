@@ -2,7 +2,6 @@ package com.epam.trenings;
 
 import com.epam.trenings.collection.DoubleLinkedList;
 import com.epam.trenings.collection.IReversIterator;
-
 import java.util.Random;
 
 public class Utils {

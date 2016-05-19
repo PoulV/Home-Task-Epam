@@ -1,7 +1,6 @@
 package com.epam.trenings;
 
 import com.epam.trenings.collection.DoubleLinkedList;
-
 import java.util.ConcurrentModificationException;
 
 public class Solution {
@@ -37,14 +36,21 @@ public class Solution {
         } catch (ConcurrentModificationException exception) {
             System.out.println("Catched ConcurrentModificationException!");
         }
+        System.out.println();
 
-        myRandomList.map(new ITypeConverter<String, Integer>() {
+        DoubleLinkedList<String> myStringList = new DoubleLinkedList<>();
+        myStringList.add("1");
+        myStringList.add("2");
+        myStringList.add("3");
+
+        DoubleLinkedList myIntegerList = myStringList.map(new ITypeConverter<String, Integer>() {
             @Override
             public Integer aply(String element) {
-                return null;
+                return Integer.parseInt(element);
             }
         });
 
+        System.out.println("Created new DoubleLinkedList with: " + myIntegerList.get(0).getClass());
 
     }
 }

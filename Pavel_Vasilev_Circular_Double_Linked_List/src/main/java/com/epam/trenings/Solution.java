@@ -43,9 +43,9 @@ public class Solution {
         myStringList.add("2");
         myStringList.add("3");
 
-        DoubleLinkedList myIntegerList = myStringList.map(new ITypeConverter<String, Integer>() {
+        DoubleLinkedList<Integer> myIntegerList = myStringList.map(new ITypeConverter<String, Integer>() {
             @Override
-            public Integer aply(String element) {
+            public Integer apply(String element) {
                 return Integer.parseInt(element);
             }
         });

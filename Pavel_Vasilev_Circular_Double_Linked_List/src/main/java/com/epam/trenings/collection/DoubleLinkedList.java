@@ -236,10 +236,10 @@ public class DoubleLinkedList<GENERAL_TYPE extends Comparable> implements Iterab
         }
     }
 
-    public DoubleLinkedList<Comparable> map(ITypeConverter converter) {
-        DoubleLinkedList<Comparable> resultDoubleLinkedList = new DoubleLinkedList<>();
-        for (Comparable element : this) {
-            Comparable result = converter.aply(element);
+    public <OUT extends Comparable<OUT>> DoubleLinkedList<OUT> map(ITypeConverter<GENERAL_TYPE, OUT> converter) {
+        DoubleLinkedList<OUT> resultDoubleLinkedList = new DoubleLinkedList<>();
+        for (GENERAL_TYPE element : this) {
+            OUT result = converter.apply(element);
             resultDoubleLinkedList.add(result);
         }
         return resultDoubleLinkedList;

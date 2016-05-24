@@ -19,10 +19,10 @@ public class Philosopher implements Runnable {
     public void run() {
         while (true) {
             try {
-                if (rightFork.get(this.name)) {
-                    synchronized (rightFork) {
-                        if (leftFork.get(this.name)) {
-                            synchronized (leftFork) {
+                synchronized (rightFork) {
+                    if (rightFork.get(this.name)) {
+                        synchronized (leftFork) {
+                            if (leftFork.get(this.name)) {
                                 System.out.println(name + " eating delicious ...");
                                 Thread.currentThread().sleep(200);
                                 System.out.println(name + " eating done, and start thinking...");

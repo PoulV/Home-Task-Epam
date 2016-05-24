@@ -15,12 +15,12 @@ public class Fork {
         this.availableStatus = true;
     }
 
-    public synchronized void put(String whoPut) {
+    public void put(String whoPut) {
         this.availableStatus = AVAILABLE;
         System.out.println(whoPut + " putting " + this.name);
     }
 
-    public synchronized boolean get(String whoGet) {
+    public boolean get(String whoGet) {
         if (this.availableStatus == AVAILABLE) {
             this.availableStatus = NOT_AVAILABLE;
             System.out.println(whoGet + " getting " + this.name);

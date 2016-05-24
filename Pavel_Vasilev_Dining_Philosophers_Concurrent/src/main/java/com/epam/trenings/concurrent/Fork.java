@@ -12,12 +12,12 @@ public class Fork extends ReentrantLock{
         this.name = name;
     }
 
-    public synchronized void put(String whoPut) {
+    public void put(String whoPut) {
         unlock();
         System.out.println(whoPut + " put " + this.name);
     }
 
-    public synchronized boolean get(String whoGet) {
+    public boolean get(String whoGet) {
         System.out.println(whoGet + " get " + this.name);
         return tryLock();
     }

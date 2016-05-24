@@ -20,11 +20,15 @@ public class Philosopher implements Runnable {
         while (true) {
             try {
                 if (rightFork.get(this.name)) {
-                    if (leftFork.get(this.name)) {
-                        System.out.println(name + " eating delicious ...");
-                        Thread.currentThread().sleep(200);
-                        System.out.println(name + " eating done, and star thinking...");
-                        leftFork.put(this.name);
+                    synchronized (rightFork) {
+                        if (leftFork.get(this.name)) {
+                            synchronized (leftFork) {
+                                System.out.println(name + " eating delicious ...");
+                                Thread.currentThread().sleep(200);
+                                System.out.println(name + " eating done, and start thinking...");
+                                leftFork.put(this.name);
+                            }
+                        }
                     }
                     rightFork.put(this.name);
                 }

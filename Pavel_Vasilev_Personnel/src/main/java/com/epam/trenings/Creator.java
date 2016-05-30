@@ -16,6 +16,7 @@ public class Creator {
 
 
     private static Random random = new Random();
+
     public static Person createPerson() {
 
         String sexForNewPerson = SEX[random.nextInt(SEX.length)];
@@ -30,5 +31,15 @@ public class Creator {
 
         Person newGeneratedPerson = new Person(nameForNewPerson, random.nextInt(90), sexForNewPerson);
         return newGeneratedPerson;
+    }
+
+    public static void updateFemale(Person person) {
+        if (person.getSex().equals("F")) {
+            if ((person.getAge() - 10) < 1) {
+                person.setAge(1);
+            } else {
+                person.setAge(person.getAge() - 10);
+            }
+        }
     }
 }

@@ -1,25 +1,24 @@
 package com.epam.trenings;
 
-import com.sun.xml.internal.ws.message.Util;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import com.epam.trenings.Utils.FemaleUpdater;
+import com.epam.trenings.Utils.ListPrinter;
+import com.epam.trenings.Utils.MapPrinter;
 
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Stream.empty;
 import static java.util.stream.Stream.generate;
+
 
 /**
  * Created by Pol on 5/29/2016.
  */
 public class Runner {
     public static void run() {
-        Supplier<Person> personMaker = Creator::createPerson;
+        Supplier<Person> personMaker = Person::new;
         Stream<Person> streamOfPerson = generate(personMaker);
 
         Double averageAge = streamOfPerson.limit(10)
@@ -29,35 +28,36 @@ public class Runner {
 
 
         streamOfPerson = generate(personMaker);
-        //System.out.println();
+        System.out.println();
         System.out.println("Stream person before sort:");
         List<Person> sortedPersonList = streamOfPerson.limit(10)
-                .peek(Person::print)
+                .peek(System.out::println)
                 .sorted((personFirst, personSecond) -> personFirst.getAge().compareTo(personSecond.getAge()))
                 .collect(Collectors.toList());
-        Utils.printList("Stream person after sort by age:", sortedPersonList);
+        ListPrinter.print("Stream person after sort by age:", sortedPersonList);
 
-        //System.out.println();
         System.out.println("Stream person before select repeat person:");
-        Map<String, Integer> mapOfNames = new HashMap<>();
         streamOfPerson = generate(personMaker);
-        streamOfPerson.limit(10)
-                .peek(Person::print)
-                .forEach((person)->{if (mapOfNames.containsKey(person.getName())) {
-                    mapOfNames.put(person.getName(), mapOfNames.get(person.getName()) + 1);
-                } else {
-                    mapOfNames.put(person.getName(), 1);
-                }});
-        Utils.printMap("Repeat person:", mapOfNames);
+        Map<String, Long> mapOfNames = streamOfPerson.limit(10)
+                .peek(System.out::println)
+                .collect(Collectors.groupingBy(Person::getName, Collectors.counting()));
+        MapPrinter.print("Repeat person:", mapOfNames);
 
         System.out.println("Stream person before update female person:");
         streamOfPerson = generate(personMaker);
-        streamOfPerson.limit(10)
-                .peek(Person::print)
-                .forEach(Creator::updateFemale(person));
-        Utils.printMap("Repeat person:", mapOfNames);
+        List<Person> listPersonToUpdate = streamOfPerson.limit(10)
+                .peek(System.out::println)
+                .map(FemaleUpdater::updateFemale)
+                .collect(Collectors.toList());
+        ListPrinter.print("Updated person:", listPersonToUpdate);
 
-
-
+        streamOfPerson = generate(personMaker);
+        System.out.println();
+        System.out.println("Stream person with teen:");
+        List<Person> listPersonWithoutTeen = streamOfPerson.limit(20)
+                .peek(System.out::println)
+                .filter(person ->  person.getAge() > 18 )
+                .collect(Collectors.toList());
+        ListPrinter.print("Stream person without teen:", listPersonWithoutTeen);
     }
 }

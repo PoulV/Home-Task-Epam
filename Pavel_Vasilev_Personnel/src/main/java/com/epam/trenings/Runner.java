@@ -1,8 +1,8 @@
 package com.epam.trenings;
 
-import com.epam.trenings.Utils.FemaleUpdater;
-import com.epam.trenings.Utils.ListPrinter;
-import com.epam.trenings.Utils.MapPrinter;
+import com.epam.trenings.person.FemaleUpdater;
+import com.epam.trenings.person.Person;
+import com.epam.trenings.person.PersonGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -18,10 +18,12 @@ import static java.util.stream.Stream.generate;
  */
 public class Runner {
     public static void run() {
-        Supplier<Person> personMaker = Person::new;
+        Supplier<Person> personMaker = PersonGenerator::generateRandomPerson;
         Stream<Person> streamOfPerson = generate(personMaker);
 
+        System.out.println("Stream person before calculate average age:");
         Double averageAge = streamOfPerson.limit(10)
+                .peek(System.out::println)
                 .mapToInt(Person::getAge)
                 .average().getAsDouble();
         System.out.println("Average age is " + averageAge);
@@ -34,14 +36,14 @@ public class Runner {
                 .peek(System.out::println)
                 .sorted((personFirst, personSecond) -> personFirst.getAge().compareTo(personSecond.getAge()))
                 .collect(Collectors.toList());
-        ListPrinter.print("Stream person after sort by age:", sortedPersonList);
+        Utils.printList("Stream person after sort by age:", sortedPersonList);
 
         System.out.println("Stream person before select repeat person:");
         streamOfPerson = generate(personMaker);
         Map<String, Long> mapOfNames = streamOfPerson.limit(10)
                 .peek(System.out::println)
                 .collect(Collectors.groupingBy(Person::getName, Collectors.counting()));
-        MapPrinter.print("Repeat person:", mapOfNames);
+        Utils.printMap("Repeat person:", mapOfNames);
 
         System.out.println("Stream person before update female person:");
         streamOfPerson = generate(personMaker);
@@ -49,7 +51,7 @@ public class Runner {
                 .peek(System.out::println)
                 .map(FemaleUpdater::updateFemale)
                 .collect(Collectors.toList());
-        ListPrinter.print("Updated person:", listPersonToUpdate);
+        Utils.printList("Stream person with updated female person:", listPersonToUpdate);
 
         streamOfPerson = generate(personMaker);
         System.out.println();
@@ -58,6 +60,6 @@ public class Runner {
                 .peek(System.out::println)
                 .filter(person ->  person.getAge() > 18 )
                 .collect(Collectors.toList());
-        ListPrinter.print("Stream person without teen:", listPersonWithoutTeen);
+        Utils.printList("Stream person without teen:", listPersonWithoutTeen);
     }
 }

@@ -8,8 +8,12 @@ import com.epam.trenings.model.Handbook;
  */
 public class Runner {
     public static void run() {
-        Handbook book = new Handbook();
-        new TextTypeLoader<Handbook>().load(book);
+        Handbook handbookOfMusicStore = new Handbook();
+        TextTypeLoader<Handbook> loaderForHandbook = new TextTypeLoader<>();
+
+        System.out.println("Start loading handbook");
+        loaderForHandbook.load(handbookOfMusicStore);
+
 
     }
 }

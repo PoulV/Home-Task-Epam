@@ -3,41 +3,47 @@ package com.epam.trenings.model;
 import com.epam.trenings.Utils;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by pava0715 on 01.06.2016.
  */
-public class Composition implements Serializable {
-    private Map<String, Album> albumMap = new HashMap<>();
+public class Composition implements Serializable, INamed {
+    private List<Album> albumList = new LinkedList<>();
     private String name;
     private Long length;
 
+    public Composition(String name, Long length) {
+        this.name = name;
+        this.length = length;
+    }
+
+    @Override
     public String getName() {
         return name;
     }
 
-    public Composition(String name, Long length, Album... parentAlbums) {
+    @Override
+    public void setName(String name) {
         this.name = name;
-        this.length = length;
-        setAlbums(parentAlbums);
+    }
+
+    public Long getLength() {
+        return length;
+    }
+
+    public List<Album> getAlbumList() {
+        return albumList;
     }
 
     public void setAlbums(Album... parentAlbums) {
         for (Album album : parentAlbums) {
-            albumMap.put(album.getName(), album);
+            if (!albumList.contains(album)) {
+                Utils.putIfNotExist(albumList, album);
+            }
         }
     }
 
-    public Map<String, Album> getAlbumMap() {
-        return albumMap;
-    }
 
-    @Override
-    public String toString() {
-        return "Composition- " +
-                "name=" + name +
-                ", length=" + Utils.getReadableTime(length);
-    }
 }

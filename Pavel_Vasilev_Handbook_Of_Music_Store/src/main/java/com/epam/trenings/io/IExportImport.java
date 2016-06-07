@@ -8,5 +8,5 @@ import com.epam.trenings.model.Handbook;
 public interface IExportImport {
     Handbook load(String path);
 
-    void save(Handbook objectToImport, String path);
+    void save(Handbook objectToExport, String path);
 }

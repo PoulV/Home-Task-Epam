@@ -2,14 +2,13 @@ package com.epam.trenings.model;
 
 import com.epam.trenings.Utils;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by pava0715 on 01.06.2016.
  */
-public class Album implements Serializable, INamed {
+public class Album implements INamed {
     private String name;
     private String genre;
     private List<Composition> compositionList = new LinkedList<>();
@@ -23,11 +22,6 @@ public class Album implements Serializable, INamed {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getGenre() {

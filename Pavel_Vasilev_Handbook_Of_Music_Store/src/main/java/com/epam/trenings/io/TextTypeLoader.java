@@ -1,12 +1,13 @@
 package com.epam.trenings.io;
 
-import com.epam.trenings.Utils;
 import com.epam.trenings.model.Album;
 import com.epam.trenings.model.Composition;
 import com.epam.trenings.model.Handbook;
 import com.epam.trenings.model.Musician;
 
 import java.io.*;
+
+import static com.epam.trenings.Utils.*;
 
 
 /**
@@ -20,35 +21,32 @@ public class TextTypeLoader implements IExportImport {
             FileInputStream fileInputStream = new FileInputStream(path);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             BufferedReader reader = new BufferedReader(inputStreamReader);
-
             String lineFromFile;
-            String lineOfValues;
-
             Composition lastComposition = null;
             Album lastAlbum = null;
             Musician lastMusician;
 
             while ((lineFromFile = reader.readLine()) != null) {
-                lineFromFile = lineFromFile.replaceAll(Utils.PREF, Utils.EMPTY_STRING).trim();
-                lineOfValues = lineFromFile.substring(lineFromFile.indexOf(Utils.TYPE_NAME_SEPARATOR));
-
-                switch (lineFromFile.split(Utils.TYPE_NAME_SEPARATOR)[Utils.ZERO]) {
-                    case Utils.COMPOSITION:
-                        lastComposition = Utils.getCompositionFromString(lineOfValues);
-                        Utils.putIfNotExist(resultHandbook.compositionList, lastComposition);
+                lineFromFile = lineFromFile.replaceAll(PREF, EMPTY_STRING).trim();
+                String typeFromLine = getTypeFromTextView(lineFromFile);
+                String lineWithProperty = getLineWithProperty(lineFromFile);
+                switch (typeFromLine) {
+                    case COMPOSITION:
+                        lastComposition = getCompositionFromString(lineWithProperty);
+                        putIfNotExist(resultHandbook.compositionList, lastComposition);
                         break;
-                    case Utils.ALBUM:
+                    case ALBUM:
                         if (lastComposition != null) {
-                            lastAlbum = Utils.getAlbumFromString(lineOfValues);
-                            Utils.putIfNotExist(resultHandbook.albumList, lastAlbum);
-                            Utils.getByName(resultHandbook.albumList, lastAlbum.getName()).addComposition(lastComposition);
+                            lastAlbum = getAlbumFromString(lineWithProperty);
+                            putIfNotExist(resultHandbook.albumList, lastAlbum);
+                            getByName(resultHandbook.albumList, lastAlbum.getName()).addComposition(lastComposition);
                         }
                         break;
-                    case Utils.MUSICIAN:
+                    case MUSICIAN:
                         if (!resultHandbook.albumList.isEmpty()) {
-                            lastMusician = Utils.getMusicianFromString(lineOfValues);
-                            Utils.putIfNotExist(resultHandbook.musiciansList, lastMusician);
-                            Utils.getByName(resultHandbook.musiciansList, lastMusician.getName()).addAlbums(lastAlbum);
+                            lastMusician = getMusicianFromString(lineWithProperty);
+                            putIfNotExist(resultHandbook.musiciansList, lastMusician);
+                            getByName(resultHandbook.musiciansList, lastMusician.getName()).addAlbums(lastAlbum);
                         }
                         break;
                 }
@@ -61,28 +59,25 @@ public class TextTypeLoader implements IExportImport {
             System.out.println("Input/output exception when try load object.");
             exceptionIO.printStackTrace();
         }
-
         return resultHandbook;
     }
 
-
     @Override
-    public void save(Handbook objectToExport, String path) {
+    public void save(Handbook handbookForExport, String path) {
         try {
             FileOutputStream fileOutStream = new FileOutputStream(path);
             OutputStreamWriter outStream = new OutputStreamWriter(fileOutStream);
             BufferedWriter bufferedWriter = new BufferedWriter(outStream);
 
-            for (Composition song : objectToExport.compositionList) {
-                Utils.writeSongString(bufferedWriter, song, Utils.EMPTY_STRING);
+            for (Composition song : handbookForExport.compositionList) {
+                getStringFromNamed(bufferedWriter, song, EOL);
                 for (Album album : song.getAlbumList()) {
-                    Utils.writeAlbumString(bufferedWriter, album, Utils.PREF);
+                    getStringFromNamed(bufferedWriter, album, EOL, PREF);
                     for (Musician musician : album.getMusicianList()) {
-                        Utils.writeMusicianString(bufferedWriter, musician, Utils.DOUBLE_PREF);
+                        getStringFromNamed(bufferedWriter, musician, EOL, DOUBLE_PREF);
                     }
                 }
             }
-
             bufferedWriter.flush();
             bufferedWriter.close();
         } catch (FileNotFoundException fileNotFoundException) {

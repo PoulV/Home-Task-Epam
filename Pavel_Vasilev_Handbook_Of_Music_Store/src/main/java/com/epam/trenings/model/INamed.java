@@ -5,6 +5,4 @@ package com.epam.trenings.model;
  */
 public interface INamed {
     String getName();
-
-    void setName(String name);
 }

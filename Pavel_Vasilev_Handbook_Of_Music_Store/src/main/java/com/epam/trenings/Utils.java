@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by Pol on 6/6/2016.
@@ -16,7 +18,6 @@ public class Utils {
     public static final String TYPE_NAME_SEPARATOR = ": ";
     public static final String FIELD_VALUE_SEPARATOR = " = ";
     public static final String FIELD_SEPARATOR = ", ";
-
     public static final String ALBUM = "Album";
     public static final String MUSICIAN = "Musician";
     public static final String COMPOSITION = "Composition";
@@ -37,45 +38,63 @@ public class Utils {
         StringBuffer handbookAsText = new StringBuffer();
 
         for (Musician musician : handbookForPrint.musiciansList) {
-            writeMusicianString(handbookAsText, musician, EMPTY_STRING);
+            getStringFromNamed(handbookAsText, musician, EOL);
             for (Album album : musician.getAlbumList()) {
-                writeAlbumString(handbookAsText, album, PREF);
+                getStringFromNamed(handbookAsText, album, EOL, PREF);
                 for (Composition song : album.getCompositionList()) {
-                    writeSongString(handbookAsText, song, DOUBLE_PREF);
+                    getStringFromNamed(handbookAsText, song, EOL, DOUBLE_PREF);
                 }
             }
         }
         System.out.println(handbookAsText.toString());
     }
 
-    public static void writeMusicianString(Appendable buffer, Musician musicianForWrite, String prefix) {
+    public static void getStringFromNamed(Appendable buffer, INamed namedForWrite) {
+        getStringFromNamed(buffer, namedForWrite, EMPTY_STRING, EMPTY_STRING);
+    }
+
+    public static void getStringFromNamed(Appendable buffer, INamed namedForWrite, String endOfLine) {
+        getStringFromNamed(buffer, namedForWrite, endOfLine, EMPTY_STRING);
+    }
+
+    public static void getStringFromNamed(Appendable buffer, INamed namedForWrite, String endOfLine, String prefix) {
         try {
-            buffer.append(prefix).append(MUSICIAN).append(TYPE_NAME_SEPARATOR)
-                    .append(NAME).append(FIELD_VALUE_SEPARATOR).append(musicianForWrite.getName()).append(EOL);
+            switch (namedForWrite.getClass().getSimpleName()) {
+                case COMPOSITION:
+                    buffer.append(prefix).append(COMPOSITION).append(TYPE_NAME_SEPARATOR);
+                    appendName(buffer, namedForWrite.getName(), FIELD_SEPARATOR);
+                    appendProperty(buffer, LENGTH, getReadableTime(((Composition) namedForWrite).getLength()), endOfLine);
+                    break;
+                case ALBUM:
+                    buffer.append(prefix).append(ALBUM).append(TYPE_NAME_SEPARATOR);
+                    appendName(buffer, namedForWrite.getName(), FIELD_SEPARATOR);
+                    appendProperty(buffer, GENRE, ((Album) namedForWrite).getGenre(), endOfLine);
+                    break;
+                case MUSICIAN:
+                    buffer.append(prefix).append(MUSICIAN).append(TYPE_NAME_SEPARATOR);
+                    appendName(buffer, namedForWrite.getName(), EOL);
+                    break;
+            }
         } catch (IOException e) {
-            System.out.println("Input/output exception when create Musician as string");
+            System.out.println("Input/output exception when create Named as string");
             e.printStackTrace();
         }
     }
 
-    public static void writeAlbumString(Appendable buffer, Album albumForWrite, String prefix) {
+    private static void appendName(Appendable buffer, String name, String end) {
         try {
-            buffer.append(prefix).append(ALBUM).append(TYPE_NAME_SEPARATOR)
-                    .append(NAME).append(FIELD_VALUE_SEPARATOR).append(albumForWrite.getName()).append(FIELD_SEPARATOR)
-                    .append(GENRE).append(FIELD_VALUE_SEPARATOR).append(albumForWrite.getGenre()).append(EOL);
+            buffer.append(NAME).append(FIELD_VALUE_SEPARATOR).append(name).append(end);
         } catch (IOException e) {
-            System.out.println("Input/output exception when create Musician as string");
+            System.out.println("Input/output exception when create Named as string");
             e.printStackTrace();
         }
     }
 
-    public static void writeSongString(Appendable buffer, Composition songForWrite, String prefix) {
+    private static void appendProperty(Appendable buffer, String propertyName, String propertyValue, String end) {
         try {
-            buffer.append(prefix).append(COMPOSITION).append(TYPE_NAME_SEPARATOR)
-                    .append(NAME).append(FIELD_VALUE_SEPARATOR).append(songForWrite.getName()).append(FIELD_SEPARATOR)
-                    .append(LENGTH).append(FIELD_VALUE_SEPARATOR).append(getReadableTime(songForWrite.getLength())).append(EOL);
+            buffer.append(propertyName).append(FIELD_VALUE_SEPARATOR).append(propertyValue).append(end);
         } catch (IOException e) {
-            System.out.println("Input/output exception when create Musician as string");
+            System.out.println("Input/output exception when create Named as string");
             e.printStackTrace();
         }
     }
@@ -194,11 +213,13 @@ public class Utils {
         Utils.printHandbook("Downloaded by " + loader.getClass().getSimpleName() + ":", resultHandBook);
     }
 
-    public static <NAMED extends INamed> List<String> getListOfNames(List<NAMED> namedList) {
-        List<String> resultListOfName = new LinkedList<>();
-        for (NAMED namedObject : namedList) {
-            resultListOfName.add(namedObject.getName());
-        }
-        return resultListOfName;
+    public static String getTypeFromTextView(String inputLine) {
+        String typeFromLine = inputLine.split(TYPE_NAME_SEPARATOR)[ZERO];
+        return typeFromLine;
+    }
+
+    public static String getLineWithProperty(String inputLine) {
+        String lineWithProperty = inputLine.substring(inputLine.indexOf(TYPE_NAME_SEPARATOR));
+        return lineWithProperty;
     }
 }

@@ -1,5 +1,6 @@
 package com.epam.trenings.io;
 
+import com.epam.trenings.entities.EntityModel;
 import com.epam.trenings.model.Handbook;
 
 import java.io.*;
@@ -9,14 +10,17 @@ import java.io.*;
  */
 public class ByteTypeLoader implements IExportImport {
 
+    private EntityModel entityModel = new EntityModel();
+
     @Override
     public Handbook load(String path) {
-        Handbook result = null;
+        EntityModel newEntityModel = new EntityModel();
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
             ObjectInputStream inputStream = new ObjectInputStream(fileInputStream);
 
-            result = (Handbook) inputStream.readObject();
+            newEntityModel = (EntityModel) inputStream.readObject();
+
             inputStream.close();
         } catch (FileNotFoundException fileNotFoundException) {
             System.out.println("File " + path + " not found in root project directory.");
@@ -28,16 +32,17 @@ public class ByteTypeLoader implements IExportImport {
             System.out.println("Exceptiont when try convert loaded object.");
             classNotFoundException.printStackTrace();
         }
-        return result;
+        return newEntityModel.getHandbookFromEntity();
     }
 
     @Override
-    public void save(Handbook objectToExport, String path) {
+    public void save(Handbook handbookForExport, String path) {
+        entityModel.fillFrom(handbookForExport);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(path);
             ObjectOutputStream outputStream = new ObjectOutputStream(fileOutputStream);
 
-         //   outputStream.writeObject(objectToImport);
+            outputStream.writeObject(entityModel);
 
             outputStream.flush();
             outputStream.close();

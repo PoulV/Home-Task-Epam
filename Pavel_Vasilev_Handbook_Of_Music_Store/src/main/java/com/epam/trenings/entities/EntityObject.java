@@ -1,32 +1,25 @@
 package com.epam.trenings.entities;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by Pol on 6/7/2016.
  */
 public class EntityObject implements Serializable {
-    private ObjectType entityType;
+    private EntityUtils.EntityType entityType;
     private String stringViewOfObject;
-    private List<String> dependencyListToMusician;
-    private List<String> dependencyListToComposition;
 
-    public EntityObject(String stringViewOfObject, List<String> dependencyListToMusician, List<String> dependencyListToComposition) {
+    public EntityObject(String stringViewOfObject, EntityUtils.EntityType entityType) {
         this.stringViewOfObject = stringViewOfObject;
-        this.dependencyListToMusician = dependencyListToMusician;
-        this.dependencyListToComposition = dependencyListToComposition;
+        this.entityType = entityType;
     }
 
-    public ObjectType getEntityType() {
+    public String getStringViewOfObject() {
+        return stringViewOfObject;
+    }
+
+    public EntityUtils.EntityType getEntityType() {
         return entityType;
     }
 
-    public List<String> getDependencyListToMusician() {
-        return dependencyListToMusician;
-    }
-
-    public List<String> getDependencyListToComposition() {
-        return dependencyListToComposition;
-    }
 }

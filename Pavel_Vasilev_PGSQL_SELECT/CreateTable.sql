@@ -8,10 +8,10 @@
 CREATE TABLE goods (
   good_id SERIAL PRIMARY KEY,
   name VARCHAR(50) NOT NULL,
-  contaiver VARCHAR(50) NOT NULL,
+  container VARCHAR(50) NOT NULL,
   dimension VARCHAR(50) NOT NULL,  
-  weight_kg decimal CONSTRAINT positive_price CHECK (weight_kg > 0) NOT NULL,
-  price_USD MONEY
+  weight_kg DECIMAL CONSTRAINT positive_weight CHECK (weight_kg > 0) NOT NULL,
+  price_USD MONEY CONSTRAINT positive_price CHECK (price_USD > 0::MONEY)
 );
 
 CREATE TABLE delivery_companies (
@@ -34,9 +34,18 @@ CREATE TABLE providers (
 CREATE TABLE storages (
   storage_id SERIAL PRIMARY KEY,
   name VARCHAR(50) NOT NULL,
-  address_id INT REFERENCES address(address_id),
+  address_id INT REFERENCES address(address_id),  
+  good_id INT REFERENCES goods(good_id),
+  area_square_yard DECIMAL NOT NULL
+);
+
+CREATE TABLE contracts (
+  contract_id SERIAL PRIMARY KEY,
   provider_id INT REFERENCES providers(provider_id),
-  good_id INT REFERENCES goods(good_id)
+  storage_id INT REFERENCES storages(storage_id),
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  description VARCHAR(50)
 );
 
 INSERT INTO address (country, city, address)
@@ -52,7 +61,7 @@ VALUES 	('USA', 'New York', '1st ave'),
 	('USA', 'San Francisco', '200 McAllister St'),	
 	('USA', 'Las Vegas', '309 S Valley View Blvd');
 
-INSERT INTO goods (name, contaiver, dimension, weight_kg, price_USD)
+INSERT INTO goods (name, container, dimension, weight_kg, price_USD)
 VALUES 	('Soft boots', 'box', '30 x 15 x 10', 1.5, 1),
 	('Heavy boots', 'box', '35 x 20 x 15', 3.5, 1.5),
 	('Silver spoon', 'box', '15 x 7 x 1,5', 0.3, 4),
@@ -73,11 +82,20 @@ VALUES	('Cutlery John & Sons', 1, 4, 1, DATE '2000-02-19'),
 	('Dejounte Boots', 4, 1, 2, DATE '2010-10-12'),
 	('Dejounte Boots', 4, 2, 2, DATE '2010-10-12');
 
-INSERT INTO storages (name, address_id, provider_id, good_id)
-VALUES 	('USA National Spoon And Fork Storage', 4, 1, 1),	
-	('USA National Spoon And Fork Storage', 4, 1, 2),
-	('USA National Spoon And Fork Storage', 4, 1, 3),
-	('Sacramento Greate Spoon Storage', 9, 3, 3),
-	('NV Boots', 11, 4, 1),
-	('NV Boots', 11, 5, 2),
-	('Manific Boots Storage', 4, 2, 2);
+INSERT INTO storages (name, address_id, good_id, area_square_yard)
+VALUES 	('USA National Spoon And Fork Storage', 4, 3, 250),	
+	('USA National Spoon And Fork Storage', 4, 4, 250),
+	('USA National Spoon And Fork Storage', 4, 5, 250),
+	('Sacramento Greate Spoon Storage', 9, 3, 300),
+	('NV Boots', 11, 1, 150),
+	('NV Boots', 11, 2, 150),
+	('Manific Boots Storage', 4, 2, 123.5);
+
+INSERT INTO contracts ( provider_id, storage_id, start_date, end_date, description)
+VALUES	(3, 1, DATE '2000-02-19', DATE '2050-02-19', NULL),
+	(1, 2, DATE '2000-02-19', DATE '2050-02-19', NULL),
+	(2, 3, DATE '2000-02-19', DATE '2050-02-19', NULL),
+	(3, 4, DATE '2016-01-01', DATE '2017-01-01', 'Ask John'),
+	(4, 5, DATE '2016-05-19', DATE '2016-09-01', NULL),
+	(5, 6, DATE '2016-05-19', DATE '2016-09-18', NULL),
+	(4, 7, DATE '2016-02-19', DATE '2017-02-19', 'entrance from the yard');

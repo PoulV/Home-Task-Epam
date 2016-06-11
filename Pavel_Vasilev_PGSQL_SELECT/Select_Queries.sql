@@ -9,7 +9,7 @@ WHERE address_id in (
 SELECT DISTINCT storages.name storage_name, selected_goods.name goods, selected_goods.price price_USD
 FROM storages, (
 	SELECT name, price_USD price  FROM goods
-	WHERE price_USD = 4::money
+	WHERE price_USD = 4::MONEY
 ) selected_goods
 ORDER BY goods;
 
@@ -34,3 +34,12 @@ WHERE good_id in (
 		WHERE city = 'Vancouver'
 	)
 );
+
+-- 6. Select providers and all used storage area
+SELECT providers.name provider, SUM(storages.area_square_yard) total_area
+FROM providers 
+INNER JOIN contracts 
+	ON contracts.provider_id = providers.provider_id
+INNER JOIN storages
+	ON contracts.storage_id = storages.storage_id
+ GROUP BY providers.name

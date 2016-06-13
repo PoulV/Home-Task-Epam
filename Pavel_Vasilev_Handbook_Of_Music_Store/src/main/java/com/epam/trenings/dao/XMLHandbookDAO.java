@@ -98,7 +98,6 @@ public class XMLHandbookDAO implements IHandbookDAO {
         insertMusician(musicianForUpdate);
     }
 
-    @Override
     public Long getSumLength(Integer musicianID) {
         Long resultSum = 0L;
         String tempID, songLength;

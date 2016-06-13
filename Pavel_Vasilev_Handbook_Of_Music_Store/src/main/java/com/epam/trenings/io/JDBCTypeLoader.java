@@ -14,7 +14,12 @@ import com.epam.trenings.model.Musician;
 public class JDBCTypeLoader implements IExportImport {
     @Override
     public Handbook load() {
-        return null;
+        IAbstractFactoryDAO factoryDAO = new JDBCFactoryDAO();
+        JDBCHandbookDAO dao = (JDBCHandbookDAO) factoryDAO.createHandbookDAO();
+
+        Handbook resultHandbook = new Handbook(dao.getAllMusician());
+        dao.closeConnection();
+        return resultHandbook;
     }
 
     @Override
@@ -24,7 +29,7 @@ public class JDBCTypeLoader implements IExportImport {
 
         handbookForExport.getMusiciansList()
                 .stream()
-                .forEach(musician -> dao.insertMusician(musician));
-
+                .forEach(musician -> dao.insertOrUpdateMusicion(musician));
+        dao.closeConnection();
     }
 }

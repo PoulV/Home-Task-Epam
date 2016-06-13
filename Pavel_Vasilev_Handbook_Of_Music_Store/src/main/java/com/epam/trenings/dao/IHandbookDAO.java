@@ -13,5 +13,4 @@ public interface IHandbookDAO {
     void insertMusician(Musician musicianForImport);
     void deleteMusician(Integer id);
     void updateMusician(Musician musicianForUpdate);
-    Long getSumLength(Integer musicianID);
 }

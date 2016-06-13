@@ -33,6 +33,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             connection = DriverManager.getConnection(urlForConnection, properties);
             System.out.println("Successful connect to db");
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try connect to db");
             e.printStackTrace();
         }
     }
@@ -51,6 +52,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             musiciansResultSet = statement.executeQuery();
             createMusiciansFromResultSet(musiciansResultSet);
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try get musician by ID = " + id);
             e.printStackTrace();
         }
         return totalMusicianList.get(id);
@@ -68,6 +70,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             musiciansResultSet = statement.executeQuery();
             createMusiciansFromResultSet(musiciansResultSet);
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try get all musicians");
             e.printStackTrace();
         }
         return totalMusicianList;
@@ -94,6 +97,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
                 statement.execute();
             }
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try delete musician by ID = " + id);
             e.printStackTrace();
         }
     }
@@ -109,6 +113,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             connection.close();
             System.out.println("Connection successfully closed");
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try close JDBC connection");
             e.printStackTrace();
         }
     }
@@ -134,6 +139,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
                 Utils.putIfNotExist(totalMusicianList, tempMusician);
             }
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try create musicians by resultSet");
             e.printStackTrace();
         }
     }
@@ -163,6 +169,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
                 parentMusician.addAlbums(tempAlbum);
             }
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try create albums by resultSet");
             e.printStackTrace();
         }
     }
@@ -179,6 +186,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
                 parentAlbum.addComposition(tempSong);
             }
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try create compositions by resultSet");
             e.printStackTrace();
         }
     }

@@ -37,6 +37,8 @@ public class JDBCUtils {
             statement.setString(2, musicianForWrite.getName());
             statement.execute();
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try insert musician(id = "
+                    + musicianForWrite.getId() + ") to db");
             e.printStackTrace();
         }
     }
@@ -52,6 +54,8 @@ public class JDBCUtils {
             statement.setString(3, albumForWrite.getGenre());
             statement.execute();
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try insert album(id = "
+                    + albumForWrite.getId() + ") to db");
             e.printStackTrace();
         }
     }
@@ -67,6 +71,8 @@ public class JDBCUtils {
             statement.setLong(3, songForWrite.getLength());
             statement.execute();
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try insert composition(id = "
+                    + songForWrite.getId() + ") to db");
             e.printStackTrace();
         }
     }
@@ -81,6 +87,8 @@ public class JDBCUtils {
             statement.setInt(2, musicianForWrite.getId());
             statement.execute();
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try update musician(id = "
+                    + musicianForWrite.getId() + ")");
             e.printStackTrace();
         }
     }
@@ -96,6 +104,8 @@ public class JDBCUtils {
             statement.setInt(3, albumForWrite.getId());
             statement.execute();
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try update album(id = "
+                    + albumForWrite.getId() + ")");
             e.printStackTrace();
         }
     }
@@ -111,6 +121,8 @@ public class JDBCUtils {
             statement.setInt(3, songForWrite.getId());
             statement.execute();
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try update composition(id = "
+                    + songForWrite.getId() + ")");
             e.printStackTrace();
         }
     }
@@ -124,6 +136,8 @@ public class JDBCUtils {
             ResultSet resultSet = statement.executeQuery();
             resultResponse = resultSet.isBeforeFirst();
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try check verify exist "
+                    + objectWithID.getClass().getSimpleName() + " in db");
             e.printStackTrace();
         }
         return resultResponse;
@@ -149,6 +163,8 @@ public class JDBCUtils {
                 statement.execute();
             }
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try insert or update dependency for "
+                    + "musician with id  = " + masterID + "and album with id = " + slaveID);
             e.printStackTrace();
         }
     }
@@ -173,6 +189,8 @@ public class JDBCUtils {
                 statement.execute();
             }
         } catch (SQLException e) {
+            System.out.println("SQLException executed when try insert or update dependency for "
+                    + "album with id  = " + masterID + "and song with id = " + slaveID);
             e.printStackTrace();
         }
 

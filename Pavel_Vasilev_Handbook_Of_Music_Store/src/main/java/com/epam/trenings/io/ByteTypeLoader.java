@@ -9,11 +9,15 @@ import java.io.*;
  * Created by pava0715 on 02.06.2016.
  */
 public class ByteTypeLoader implements IExportImport {
-
+    private String path="";
     private EntityModel entityModel = new EntityModel();
 
+    public ByteTypeLoader(String path) {
+        this.path = path;
+    }
+
     @Override
-    public Handbook load(String path) {
+    public Handbook load() {
         EntityModel newEntityModel = new EntityModel();
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
@@ -36,7 +40,7 @@ public class ByteTypeLoader implements IExportImport {
     }
 
     @Override
-    public void save(Handbook handbookForExport, String path) {
+    public void save(Handbook handbookForExport) {
         entityModel.fillFrom(handbookForExport);
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(path);

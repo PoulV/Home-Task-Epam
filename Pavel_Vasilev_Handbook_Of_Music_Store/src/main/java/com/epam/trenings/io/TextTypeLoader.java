@@ -6,6 +6,8 @@ import com.epam.trenings.model.Handbook;
 import com.epam.trenings.model.Musician;
 
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 import static com.epam.trenings.Utils.*;
 
@@ -14,8 +16,14 @@ import static com.epam.trenings.Utils.*;
  * Created by pava0715 on 01.06.2016.
  */
 public class TextTypeLoader implements IExportImport {
+    private String path="";
+
+    public TextTypeLoader(String path) {
+        this.path = path;
+    }
+
     @Override
-    public Handbook load(String path) {
+    public Handbook load() {
         Handbook resultHandbook = new Handbook();
         try {
             FileInputStream fileInputStream = new FileInputStream(path);
@@ -25,6 +33,7 @@ public class TextTypeLoader implements IExportImport {
             Composition lastComposition = null;
             Album lastAlbum = null;
             Musician lastMusician;
+            List<Album> tempListAlbum = new LinkedList<>();
 
             while ((lineFromFile = reader.readLine()) != null) {
                 lineFromFile = lineFromFile.replaceAll(PREF, EMPTY_STRING).trim();
@@ -33,20 +42,19 @@ public class TextTypeLoader implements IExportImport {
                 switch (typeFromLine) {
                     case COMPOSITION:
                         lastComposition = getCompositionFromString(lineWithProperty);
-                        putIfNotExist(resultHandbook.compositionList, lastComposition);
                         break;
                     case ALBUM:
                         if (lastComposition != null) {
                             lastAlbum = getAlbumFromString(lineWithProperty);
-                            putIfNotExist(resultHandbook.albumList, lastAlbum);
-                            getByName(resultHandbook.albumList, lastAlbum.getName()).addComposition(lastComposition);
+                            putIfNotExist(tempListAlbum, lastAlbum);
+                            getByID(tempListAlbum, lastAlbum.getId()).addComposition(lastComposition);
                         }
                         break;
                     case MUSICIAN:
-                        if (!resultHandbook.albumList.isEmpty()) {
+                        if (lastAlbum != null) {
                             lastMusician = getMusicianFromString(lineWithProperty);
-                            putIfNotExist(resultHandbook.musiciansList, lastMusician);
-                            getByName(resultHandbook.musiciansList, lastMusician.getName()).addAlbums(lastAlbum);
+                            putIfNotExist(resultHandbook.getMusiciansList(), lastMusician);
+                            lastMusician.addAlbums(tempListAlbum.toArray(new Album[tempListAlbum.size()]));
                         }
                         break;
                 }
@@ -63,17 +71,17 @@ public class TextTypeLoader implements IExportImport {
     }
 
     @Override
-    public void save(Handbook handbookForExport, String path) {
+    public void save(Handbook handbookForExport) {
         try {
             FileOutputStream fileOutStream = new FileOutputStream(path);
             OutputStreamWriter outStream = new OutputStreamWriter(fileOutStream);
             BufferedWriter bufferedWriter = new BufferedWriter(outStream);
 
-            for (Composition song : handbookForExport.compositionList) {
+            for (Composition song : handbookForExport.getSongs()) {
                 getStringFromNamed(bufferedWriter, song, EOL);
-                for (Album album : song.getAlbumList()) {
+                for (Album album : handbookForExport.getAlbumsForSong(song)) {
                     getStringFromNamed(bufferedWriter, album, EOL, PREF);
-                    for (Musician musician : album.getMusicianList()) {
+                    for (Musician musician : handbookForExport.getMusicianForAlbum(album)) {
                         getStringFromNamed(bufferedWriter, musician, EOL, DOUBLE_PREF);
                     }
                 }

@@ -23,11 +23,11 @@ public class EntityModel implements Serializable {
     public void fillFrom(Handbook readedHandBook) {
         entityHandbook = new LinkedList<>();
 
-        for (Composition compositionForWrite : readedHandBook.compositionList) {
+        for (Composition compositionForWrite : readedHandBook.getSongs()) {
             entityHandbook.add(EntityUtils.getEntityFromNamed(compositionForWrite));
-            for (Album albumForWrite : compositionForWrite.getAlbumList()) {
+            for (Album albumForWrite : readedHandBook.getAlbumsForSong(compositionForWrite)) {
                 entityHandbook.add(EntityUtils.getEntityFromNamed(albumForWrite));
-                for (Musician musicianForWrite : albumForWrite.getMusicianList()) {
+                for (Musician musicianForWrite : readedHandBook.getMusicianForAlbum(albumForWrite)) {
                     entityHandbook.add(EntityUtils.getEntityFromNamed(musicianForWrite));
                 }
             }
@@ -39,24 +39,24 @@ public class EntityModel implements Serializable {
         Composition lastSong = null;
         Album lastAlbum = null;
         Musician lastMusician;
+        List<Album> tempAlbumList = new LinkedList<>();
         for (EntityObject currentEntity : entityHandbook) {
             switch (currentEntity.getEntityType()) {
                 case COMPOSITION:
                     lastSong = Utils.getCompositionFromString(currentEntity.getStringViewOfObject());
-                    Utils.putIfNotExist(resultHandbook.compositionList, lastSong);
                     break;
                 case ALBUM:
                     if (lastSong != null) {
                         lastAlbum = Utils.getAlbumFromString(currentEntity.getStringViewOfObject());
-                        Utils.putIfNotExist(resultHandbook.albumList, lastAlbum);
-                        Utils.getByName(resultHandbook.albumList, lastAlbum.getName()).addComposition(lastSong);
+                        Utils.putIfNotExist(tempAlbumList, lastAlbum);
+                        Utils.getByID(tempAlbumList, lastAlbum.getId()).addComposition(lastSong);
                     }
                     break;
                 case MUSICIAN:
-                    if (!resultHandbook.albumList.isEmpty()) {
+                    if (lastAlbum != null) {
                         lastMusician = Utils.getMusicianFromString(currentEntity.getStringViewOfObject());
-                        Utils.putIfNotExist(resultHandbook.musiciansList, lastMusician);
-                        Utils.getByName(resultHandbook.musiciansList, lastMusician.getName()).addAlbums(lastAlbum);
+                        Utils.putIfNotExist(resultHandbook.getMusiciansList(), lastMusician);
+                        lastMusician.addAlbums(lastAlbum);
                     }
                     break;
             }

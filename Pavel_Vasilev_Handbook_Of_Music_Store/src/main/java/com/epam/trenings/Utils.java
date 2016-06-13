@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Created by Pol on 6/6/2016.
@@ -22,6 +20,7 @@ public class Utils {
     public static final String MUSICIAN = "Musician";
     public static final String COMPOSITION = "Composition";
     public static final String NAME = "name";
+    public static final String ID = "id";
     public static final String GENRE = "genre";
     public static final String LENGTH = "length";
     public static final String EOL = "\r\n";
@@ -30,6 +29,7 @@ public class Utils {
     public static final String DOUBLE_PREF = PREF + PREF;
     public static final Integer ZERO = 0;
     public static final Integer FIRST = 1;
+    public static final Integer SECOND = 2;
 
 
     public static void printHandbook(String header, Handbook handbookForPrint) {
@@ -37,7 +37,7 @@ public class Utils {
 
         StringBuffer handbookAsText = new StringBuffer();
 
-        for (Musician musician : handbookForPrint.musiciansList) {
+        for (Musician musician : handbookForPrint.getMusiciansList()) {
             getStringFromNamed(handbookAsText, musician, EOL);
             for (Album album : musician.getAlbumList()) {
                 getStringFromNamed(handbookAsText, album, EOL, PREF);
@@ -62,17 +62,17 @@ public class Utils {
             switch (namedForWrite.getClass().getSimpleName()) {
                 case COMPOSITION:
                     buffer.append(prefix).append(COMPOSITION).append(TYPE_NAME_SEPARATOR);
-                    appendName(buffer, namedForWrite.getName(), FIELD_SEPARATOR);
+                    appendNameAndID(buffer, namedForWrite, FIELD_SEPARATOR);
                     appendProperty(buffer, LENGTH, getReadableTime(((Composition) namedForWrite).getLength()), endOfLine);
                     break;
                 case ALBUM:
                     buffer.append(prefix).append(ALBUM).append(TYPE_NAME_SEPARATOR);
-                    appendName(buffer, namedForWrite.getName(), FIELD_SEPARATOR);
+                    appendNameAndID(buffer, namedForWrite, FIELD_SEPARATOR);
                     appendProperty(buffer, GENRE, ((Album) namedForWrite).getGenre(), endOfLine);
                     break;
                 case MUSICIAN:
                     buffer.append(prefix).append(MUSICIAN).append(TYPE_NAME_SEPARATOR);
-                    appendName(buffer, namedForWrite.getName(), EOL);
+                    appendNameAndID(buffer, namedForWrite, EOL);
                     break;
             }
         } catch (IOException e) {
@@ -81,9 +81,10 @@ public class Utils {
         }
     }
 
-    private static void appendName(Appendable buffer, String name, String end) {
+    private static void appendNameAndID(Appendable buffer, INamed named, String end) {
         try {
-            buffer.append(NAME).append(FIELD_VALUE_SEPARATOR).append(name).append(end);
+            buffer.append(ID).append(FIELD_VALUE_SEPARATOR).append(named.getId().toString()).append(FIELD_SEPARATOR).
+                    append(NAME).append(FIELD_VALUE_SEPARATOR).append(named.getName()).append(end);
         } catch (IOException e) {
             System.out.println("Input/output exception when create Named as string");
             e.printStackTrace();
@@ -100,22 +101,29 @@ public class Utils {
     }
 
     public static Composition getCompositionFromString(String stringForParse) {
-        String tempName = getPropertyValue(stringForParse, Utils.ZERO);
-        Long tempCompositionLength = Utils.getMilliseconds(getPropertyValue(stringForParse, Utils.FIRST));
+
+        Integer id = Integer.parseInt(getPropertyValue(stringForParse, ZERO));
+        String tempName = getPropertyValue(stringForParse, FIRST);
+        Long tempCompositionLength = Utils.getMilliseconds(getPropertyValue(stringForParse, SECOND));
         Composition resultComposition = new Composition(tempName, tempCompositionLength);
+        resultComposition.setId(id);
         return resultComposition;
     }
 
     public static Album getAlbumFromString(String stringForParse) {
-        String tempName = getPropertyValue(stringForParse, Utils.ZERO);
-        String tempAlbumGenre = getPropertyValue(stringForParse, Utils.FIRST);
+        Integer id = Integer.parseInt(getPropertyValue(stringForParse, ZERO));
+        String tempName = getPropertyValue(stringForParse, FIRST);
+        String tempAlbumGenre = getPropertyValue(stringForParse, Utils.SECOND);
         Album resultAlbum = new Album(tempName, tempAlbumGenre);
+        resultAlbum.setId(id);
         return resultAlbum;
     }
 
     public static Musician getMusicianFromString(String stringForParse) {
-        String tempName = getPropertyValue(stringForParse, Utils.ZERO);
+        Integer id = Integer.parseInt(getPropertyValue(stringForParse, ZERO));
+        String tempName = getPropertyValue(stringForParse, FIRST);
         Musician resultMusician = new Musician(tempName);
+        resultMusician.setId(id);
         return resultMusician;
     }
 
@@ -150,7 +158,7 @@ public class Utils {
         for (NAMED objectForInsert : namedObjects) {
             boolean isNameExist = false;
             for (NAMED nameContainer : inputList) {
-                isNameExist = nameContainer.getName().equals(objectForInsert.getName());
+                isNameExist = nameContainer.getId().equals(objectForInsert.getId());
                 if (isNameExist) {
                     break;
                 }
@@ -191,25 +199,31 @@ public class Utils {
         secondMusician.addAlbums(secondAlbum);
         thirdMusician.addAlbums(firstAlbum, secondAlbum);
 
-        firstAlbum.setMusician(firstMusician, thirdMusician);
-        secondAlbum.setMusician(secondMusician, thirdMusician);
+        firstAlbum.appendMusiciansID(firstMusician.getId(), thirdMusician.getId());
+        secondAlbum.appendMusiciansID(secondMusician.getId(), thirdMusician.getId());
         firstAlbum.addComposition(firstComposition, thirdComposition);
         secondAlbum.addComposition(secondComposition, thirdComposition);
 
-        firstComposition.setAlbums(firstAlbum);
-        secondComposition.setAlbums(secondAlbum);
-        thirdComposition.setAlbums(firstAlbum, secondAlbum);
+        firstComposition.appendAlbumsID(firstAlbum.getId());
+        secondComposition.appendAlbumsID(secondAlbum.getId());
+        thirdComposition.appendAlbumsID(firstAlbum.getId(), secondAlbum.getId());
 
-        putIfNotExist(handbookForReturn.musiciansList, firstMusician, secondMusician, thirdMusician);
-        putIfNotExist(handbookForReturn.albumList, firstAlbum, secondAlbum);
-        putIfNotExist(handbookForReturn.compositionList, firstComposition, secondComposition, thirdComposition);
+        putIfNotExist(handbookForReturn.getMusiciansList(), firstMusician, secondMusician, thirdMusician);
 
         return handbookForReturn;
     }
 
-    public static void presentLoadedHandbook(Handbook handbook, IExportImport loader, String pathToFile) {
-        loader.save(handbook, pathToFile);
-        Handbook resultHandBook = loader.load(pathToFile);
+    public static Integer[] getIdFromObject(INamed... inputObjects) {
+        Integer[] resultArrayOfID = new Integer[inputObjects.length];
+        for (int i = 0; i < inputObjects.length; i++) {
+            resultArrayOfID[i] = inputObjects[i].getId();
+        }
+        return resultArrayOfID;
+    }
+
+    public static void presentLoadedHandbook(Handbook handbook, IExportImport loader) {
+        loader.save(handbook);
+        Handbook resultHandBook = loader.load();
         Utils.printHandbook("Downloaded by " + loader.getClass().getSimpleName() + ":", resultHandBook);
     }
 
@@ -222,4 +236,44 @@ public class Utils {
         String lineWithProperty = inputLine.substring(inputLine.indexOf(TYPE_NAME_SEPARATOR));
         return lineWithProperty;
     }
+
+    public static <WITH_ID extends INamed> WITH_ID getByID(List<WITH_ID> inputList, Integer id) {
+        WITH_ID objectWithIdForReturn = null;
+        for (WITH_ID objectWithId : inputList) {
+            if (objectWithId.getId().equals(id)) {
+                objectWithIdForReturn = objectWithId;
+                break;
+            }
+        }
+        return objectWithIdForReturn;
+    }
+
+
+    public static void clearLists(List<?>... lists) {
+        for (List<?> currentList : lists) {
+            currentList.clear();
+        }
+    }
+
+
+  /*  public static Integer[] stringAsArrayID(String stringWithID) {
+        String[] tempStringArray = stringWithID.split(ID_SEPARATOR);
+        Integer[] resultArrayOfID = new Integer[tempStringArray.length];
+
+        for (int i = 0; i < tempStringArray.length; i++) {
+            resultArrayOfID[i] = Integer.parseInt(tempStringArray[i]);
+        }
+
+        return resultArrayOfID;
+    }
+
+    public static String putID(String stringWithID, Integer... newID) {
+        Set<Integer> setOfId = new HashSet<>();
+        for (String stringID : stringWithID.split(ID_SEPARATOR)) {
+            setOfId.add(Integer.parseInt(stringID));
+        }
+
+
+    }*/
+
 }

@@ -5,4 +5,5 @@ package com.epam.trenings.model;
  */
 public interface INamed {
     String getName();
+    Integer getId();
 }

@@ -16,7 +16,7 @@ import static com.epam.trenings.Utils.*;
  * Created by pava0715 on 01.06.2016.
  */
 public class TextTypeLoader implements IExportImport {
-    private String path="";
+    private String path = "";
 
     public TextTypeLoader(String path) {
         this.path = path;

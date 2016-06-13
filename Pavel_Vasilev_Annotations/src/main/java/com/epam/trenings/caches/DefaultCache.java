@@ -9,6 +9,7 @@ import java.util.List;
 public class DefaultCache implements ICache {
     private List<String> defaultStorage;
 
+
     public DefaultCache() {
         defaultStorage = new LinkedList<>();
     }

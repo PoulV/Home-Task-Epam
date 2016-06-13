@@ -1,12 +1,9 @@
 package com.epam.trenings.io;
 
 import com.epam.trenings.dao.JDBCHandbookDAO;
-import com.epam.trenings.dao.XMLHandbookDAO;
 import com.epam.trenings.dao.factory.IAbstractFactoryDAO;
 import com.epam.trenings.dao.factory.JDBCFactoryDAO;
-import com.epam.trenings.dao.factory.XMLFactoryDAO;
 import com.epam.trenings.model.Handbook;
-import com.epam.trenings.model.Musician;
 
 /**
  * Created by Pol on 6/10/2016.

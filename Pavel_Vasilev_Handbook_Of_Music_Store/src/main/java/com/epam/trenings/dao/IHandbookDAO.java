@@ -9,8 +9,12 @@ import java.util.List;
  */
 public interface IHandbookDAO {
     Musician getMusicianByID(Integer id);
+
     List<Musician> getAllMusician();
+
     void insertMusician(Musician musicianForImport);
+
     void deleteMusician(Integer id);
+
     void updateMusician(Musician musicianForUpdate);
 }

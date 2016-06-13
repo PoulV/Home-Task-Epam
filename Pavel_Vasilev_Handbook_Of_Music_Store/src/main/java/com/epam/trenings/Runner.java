@@ -1,8 +1,6 @@
 package com.epam.trenings;
 
-import com.epam.trenings.io.ByteTypeLoader;
 import com.epam.trenings.io.JDBCTypeLoader;
-import com.epam.trenings.io.TextTypeLoader;
 import com.epam.trenings.io.XMLTypeLoader;
 import com.epam.trenings.model.Handbook;
 
@@ -14,22 +12,10 @@ public class Runner {
         Handbook handbookOfMusicStore = Utils.getFilledHandbook();
         Utils.printHandbook("Handbook of music stroe:", handbookOfMusicStore);
 
-       /* TextTypeLoader textLoader = new TextTypeLoader("Handbook.txt");
-        Utils.presentLoadedHandbook(handbookOfMusicStore, textLoader);
-
-
-        ByteTypeLoader byteLoader = new ByteTypeLoader("Handbook.bin");
-        Utils.presentLoadedHandbook(handbookOfMusicStore, byteLoader);
-
-
         XMLTypeLoader xmlLoader = new XMLTypeLoader("Handbook.xml");
         Utils.presentLoadedHandbook(handbookOfMusicStore, xmlLoader);
-*/
+
         JDBCTypeLoader jdbcTypeLoader = new JDBCTypeLoader();
         Utils.presentLoadedHandbook(handbookOfMusicStore, jdbcTypeLoader);
-
-
-
-
     }
 }

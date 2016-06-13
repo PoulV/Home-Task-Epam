@@ -126,7 +126,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
                         + " FROM " + TABLE_MUSICIAN_ALBUM + ", " + TABLE_ALBUM
                         + " WHERE " + TABLE_ALBUM + "." + ALBUM_ID
                         + " = " + TABLE_MUSICIAN_ALBUM + "." + ALBUM_ID
-                        + " AND " + TABLE_ALBUM + "." + ALBUM_ID + " = ?;";
+                        + " AND " + TABLE_MUSICIAN_ALBUM + "." + MUSICIAN_ID + " = ?;";
                 statement = connection.prepareCall(request);
                 statement.setInt(1, tempMusician.getId());
                 albumResultSet = statement.executeQuery();
@@ -137,7 +137,6 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             e.printStackTrace();
         }
     }
-
 
     private void createAlbumsFromResultSet(ResultSet albumResultSet, Musician parentMusician) {
         try {
@@ -152,7 +151,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
                         + " FROM " + TABLE_ALBUM_SONG + ", " + TABLE_SONG
                         + " WHERE " + TABLE_SONG + "." + SONG_ID
                         + " = " + TABLE_ALBUM_SONG + "." + SONG_ID
-                        + " AND " + TABLE_ALBUM_SONG + "." + SONG_ID + " = ?;";
+                        + " AND " + TABLE_ALBUM_SONG + "." + ALBUM_ID + " = ?;";
                 statement = connection.prepareCall(request);
                 statement.setInt(1, tempAlbum.getId());
                 songResultSet = statement.executeQuery();

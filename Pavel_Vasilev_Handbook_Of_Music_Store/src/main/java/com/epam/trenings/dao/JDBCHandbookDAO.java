@@ -3,6 +3,7 @@ package com.epam.trenings.dao;
 import com.epam.trenings.Utils;
 import com.epam.trenings.model.Album;
 import com.epam.trenings.model.Composition;
+import com.epam.trenings.model.INamed;
 import com.epam.trenings.model.Musician;
 
 import java.sql.*;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static com.epam.trenings.dao.JDBCUtils.*;
+import static com.epam.trenings.dao.SQLQueries.*;
 
 /**
  * Created by Pol on 6/12/2016.
@@ -33,8 +35,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             connection = DriverManager.getConnection(urlForConnection, properties);
             System.out.println("Successful connect to db");
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try connect to db");
-            e.printStackTrace();
+            printSQLException("SQLException executed when try connect to db", e);
         }
     }
 
@@ -45,15 +46,13 @@ public class JDBCHandbookDAO implements IHandbookDAO {
         ResultSet musiciansResultSet;
 
         try {
-            request = "SELECT * FROM " + TABLE_MUSICIAN
-                    + " WHERE " + MUSICIAN_ID + " = ?";
+            request = SELECT_MUSICIAN_BY_ID;
             PreparedStatement statement = connection.prepareCall(request);
             statement.setInt(1, id);
             musiciansResultSet = statement.executeQuery();
             createMusiciansFromResultSet(musiciansResultSet);
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try get musician by ID = " + id);
-            e.printStackTrace();
+            printSQLException("SQLException executed when try get musician by ID = " + id, e);
         }
         return totalMusicianList.get(id);
     }
@@ -65,47 +64,41 @@ public class JDBCHandbookDAO implements IHandbookDAO {
         ResultSet musiciansResultSet;
 
         try {
-            request = "SELECT * FROM " + TABLE_MUSICIAN;
+            request = SELECT_ALL_MUSICIANS;
             PreparedStatement statement = connection.prepareCall(request);
             musiciansResultSet = statement.executeQuery();
             createMusiciansFromResultSet(musiciansResultSet);
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try get all musicians");
-            e.printStackTrace();
+            printSQLException("SQLException executed when try get all musicians", e);
         }
         return totalMusicianList;
     }
 
     @Override
     public void insertMusician(Musician musicianForWrite) {
-        insertForMusician(musicianForWrite, connection);
-        insertOrUpdateAlbums(musicianForWrite, connection);
+        createMusician(INSERT_MUSICIAN, musicianForWrite);
+        insertOrUpdateAlbums(musicianForWrite);
     }
 
     @Override
     public void deleteMusician(Integer id) {
         try {
-            String request = "DELETE FROM " + TABLE_MUSICIAN_ALBUM
-                    + " WHERE " + MUSICIAN_ID + " = ?;";
-            PreparedStatement statement = connection.prepareCall(request);
+            PreparedStatement statement = connection.prepareCall(DELETE_MUSICIAN_DEPENDENCY_BY_ID);
             statement.setInt(1, id);
             if (statement.execute()) {
-                request = "DELETE FROM " + TABLE_MUSICIAN
-                        + " WHERE " + MUSICIAN_ID + " = ?;";
-                statement = connection.prepareCall(request);
+                statement = connection.prepareCall(DELETE_MUSICIAN_BY_ID);
                 statement.setInt(1, id);
                 statement.execute();
             }
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try delete musician by ID = " + id);
-            e.printStackTrace();
+            printSQLException("SQLException executed when try delete musician by ID = " + id, e);
         }
     }
 
     @Override
     public void updateMusician(Musician musicianForUpdate) {
-        updateForMusician(musicianForUpdate, connection);
-        insertOrUpdateAlbums(musicianForUpdate, connection);
+        createMusician(UPDATE_MUSICIAN_BY_ID, musicianForUpdate);
+        insertOrUpdateAlbums(musicianForUpdate);
     }
 
     public void closeConnection() {
@@ -113,52 +106,36 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             connection.close();
             System.out.println("Connection successfully closed");
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try close JDBC connection");
-            e.printStackTrace();
+            printSQLException("SQLException executed when try close JDBC connection", e);
         }
     }
 
     private void createMusiciansFromResultSet(ResultSet musiciansResultSet) {
         Musician tempMusician;
-        String request;
         PreparedStatement statement;
         ResultSet albumResultSet;
         try {
             while (musiciansResultSet.next()) {
-                tempMusician = new Musician(musiciansResultSet.getString(NAME));
-                tempMusician.setId(musiciansResultSet.getInt(MUSICIAN_ID));
-                request = "SELECT " + TABLE_ALBUM + "." + ALBUM_ID + ", " + NAME + ", " + GENRE
-                        + " FROM " + TABLE_MUSICIAN_ALBUM + ", " + TABLE_ALBUM
-                        + " WHERE " + TABLE_ALBUM + "." + ALBUM_ID
-                        + " = " + TABLE_MUSICIAN_ALBUM + "." + ALBUM_ID
-                        + " AND " + TABLE_MUSICIAN_ALBUM + "." + MUSICIAN_ID + " = ?;";
-                statement = connection.prepareCall(request);
+                tempMusician = getMusician(musiciansResultSet);
+                statement = connection.prepareCall(SELECT_ALL_ALBUM_BY_MUSICIAN_ID);
                 statement.setInt(1, tempMusician.getId());
                 albumResultSet = statement.executeQuery();
                 createAlbumsFromResultSet(albumResultSet, tempMusician);
                 Utils.putIfNotExist(totalMusicianList, tempMusician);
             }
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try create musicians by resultSet");
-            e.printStackTrace();
+            printSQLException("SQLException executed when try create musicians by resultSet", e);
         }
     }
 
     private void createAlbumsFromResultSet(ResultSet albumResultSet, Musician parentMusician) {
         try {
             Album tempAlbum;
-            String request;
             PreparedStatement statement;
             ResultSet songResultSet;
             while (albumResultSet.next()) {
-                tempAlbum = new Album(albumResultSet.getString(NAME), albumResultSet.getString(GENRE));
-                tempAlbum.setId(albumResultSet.getInt(ALBUM_ID));
-                request = "SELECT " + TABLE_SONG + "." + SONG_ID + ", " + NAME + ", " + LENGTH
-                        + " FROM " + TABLE_ALBUM_SONG + ", " + TABLE_SONG
-                        + " WHERE " + TABLE_SONG + "." + SONG_ID
-                        + " = " + TABLE_ALBUM_SONG + "." + SONG_ID
-                        + " AND " + TABLE_ALBUM_SONG + "." + ALBUM_ID + " = ?;";
-                statement = connection.prepareCall(request);
+                tempAlbum = getAlbum(albumResultSet);
+                statement = connection.prepareCall(SELECT_ALL_SONG_BY_ALBUM_ID);
                 statement.setInt(1, tempAlbum.getId());
                 songResultSet = statement.executeQuery();
                 createSongsFromResultSet(songResultSet, tempAlbum);
@@ -169,8 +146,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
                 parentMusician.addAlbums(tempAlbum);
             }
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try create albums by resultSet");
-            e.printStackTrace();
+            printSQLException("SQLException executed when try create albums by resultSet", e);
         }
     }
 
@@ -178,29 +154,147 @@ public class JDBCHandbookDAO implements IHandbookDAO {
         try {
             Composition tempSong;
             while (songResultSet.next()) {
-                tempSong = new Composition(songResultSet.getString(NAME), songResultSet.getLong(LENGTH));
-                tempSong.setId(songResultSet.getInt(SONG_ID));
+                tempSong = getSong(songResultSet);
                 Utils.putIfNotExist(totalSongList, tempSong);
                 tempSong = Utils.getByID(totalSongList, tempSong.getId());
                 tempSong.appendAlbumsID(parentAlbum.getId());
                 parentAlbum.addComposition(tempSong);
             }
         } catch (SQLException e) {
-            System.out.println("SQLException executed when try create compositions by resultSet");
-            e.printStackTrace();
+            printSQLException("SQLException executed when try create compositions by resultSet", e);
         }
     }
 
-    public void insertOrUpdateMusicion(Musician musicionForWrite) {
+    private <NAMED extends INamed> Boolean checkIfExists(String tableName, NAMED... objectsWithID) {
+        Boolean resultResponse = false;
+        String[] idNames = new String[objectsWithID.length];
+
+        for (int current = 0; current < objectsWithID.length; current++) {
+            idNames[current] = getNameOfPrimaryKey(objectsWithID[current]);
+        }
+
+        try {
+            String request = getQuerySelect(tableName, idNames);
+            PreparedStatement statement = connection.prepareCall(request);
+            for (int current = 0; current < objectsWithID.length; current++) {
+                statement.setInt(current + 1, objectsWithID[current].getId());
+            }
+            ResultSet resultSet = statement.executeQuery();
+            resultResponse = resultSet.isBeforeFirst();
+        } catch (SQLException e) {
+            printSQLException("SQLException executed when try check verify exist for "
+                    + objectsWithID.toString() + " in db", e);
+        }
+        return resultResponse;
+    }
+
+    private <NAMED extends INamed> void writeAlbumsDependency(NAMED musician, NAMED album) {
+        try {
+            Boolean isExist = checkIfExists(TABLE_MUSICIAN_ALBUM, musician, album);
+            if (!isExist) {
+                PreparedStatement statement = connection.prepareCall(INSERT_MUSICIAN_ALBUM);
+                statement.setInt(1, musician.getId());
+                statement.setInt(2, album.getId());
+                statement.execute();
+            }
+        } catch (SQLException e) {
+            printSQLException("SQLException executed when try insert or update dependency for "
+                    + "musician with id  = " + musician.getId() + "and album with id = " + album.getId(), e);
+        }
+    }
+
+    private <NAMED extends INamed> void writeSongDependency(NAMED album, NAMED song) {
+        try {
+            Boolean isExist = checkIfExists(TABLE_ALBUM_SONG, album, song);
+            if (!isExist) {
+                PreparedStatement statement = connection.prepareCall(INSERT_ALBUM_SONG);
+                statement.setInt(1, album.getId());
+                statement.setInt(2, song.getId());
+                statement.execute();
+            }
+        } catch (SQLException e) {
+            printSQLException("SQLException executed when try insert or update dependency for "
+                    + "album with id  = " + album.getId() + "and song with id = " + song.getId(), e);
+        }
+
+    }
+
+    public void insertOrUpdateMusician(Musician musicionForWrite) {
         Boolean alreadyExist;
-        alreadyExist = checkIfExists(musicionForWrite, TABLE_MUSICIAN, MUSICIAN_ID, connection);
+        alreadyExist = checkIfExists(TABLE_MUSICIAN, musicionForWrite);
         if (alreadyExist) {
-            updateMusician(musicionForWrite);
+            createMusician(UPDATE_MUSICIAN_BY_ID, musicionForWrite);
         } else {
-            insertMusician(musicionForWrite);
+            createMusician(INSERT_MUSICIAN, musicionForWrite);
+        }
+        insertOrUpdateAlbums(musicionForWrite);
+    }
+
+    private void insertOrUpdateAlbums(Musician parentMusician) {
+        Boolean alreadyExist;
+        for (Album currentAlbum : parentMusician.getAlbumList()) {
+            alreadyExist = checkIfExists(TABLE_ALBUM, currentAlbum);
+            if (alreadyExist) {
+                createAlbum(UPDATE_ALBUM_BY_ID, currentAlbum);
+            } else {
+                createAlbum(INSERT_ALBUM, currentAlbum);
+            }
+            writeAlbumsDependency(parentMusician, currentAlbum);
+            insertOrUpdateSongs(currentAlbum);
         }
     }
 
+    private void insertOrUpdateSongs(Album parentAlbum) {
+        Boolean alreadyExist;
+        for (Composition currentSong : parentAlbum.getCompositionList()) {
+            alreadyExist = checkIfExists(TABLE_SONG, currentSong);
+            if (alreadyExist) {
+                createComposition(UPDATE_SONG_BY_ID, currentSong);
+            } else {
+                createComposition(INSERT_SONG, currentSong);
+            }
+            writeSongDependency(parentAlbum, currentSong);
+        }
+    }
 
+    private void createMusician(String insertOrUpdateQuery, Musician musicianForWrite) {
+        try {
+            PreparedStatement statement = connection.prepareCall(insertOrUpdateQuery);
+            statement.setString(1, musicianForWrite.getName());
+            statement.setInt(2, musicianForWrite.getId());
+            statement.execute();
+        } catch (SQLException e) {
+            printSQLException("SQLException executed when try insert or update musician(id = "
+                    + musicianForWrite.getId() + ")", e);
+        }
+    }
+
+    private void createAlbum(String insertOrUpdateQuery, Album albumForWrite) {
+        try {
+            PreparedStatement statement = connection.prepareCall(insertOrUpdateQuery);
+            statement.setString(1, albumForWrite.getName());
+            statement.setString(2, albumForWrite.getGenre());
+            statement.setInt(3, albumForWrite.getId());
+
+            statement.execute();
+        } catch (SQLException e) {
+            printSQLException("SQLException executed when try insert or update album(id = "
+                    + albumForWrite.getId() + ")", e);
+        }
+    }
+
+    private void createComposition(String insertOrUpdateQuery, Composition songForWrite) {
+        try {
+            PreparedStatement statement = connection.prepareCall(insertOrUpdateQuery);
+            statement.setString(1, songForWrite.getName());
+            statement.setLong(2, songForWrite.getLength());
+            statement.setInt(3, songForWrite.getId());
+
+            statement.execute();
+        } catch (SQLException e) {
+            printSQLException("SQLException executed when try update composition(id = "
+                    + songForWrite.getId() + ")", e);
+        }
+    }
 }
 

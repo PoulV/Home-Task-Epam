@@ -26,7 +26,7 @@ public class JDBCTypeLoader implements IExportImport {
 
         handbookForExport.getMusiciansList()
                 .stream()
-                .forEach(musician -> dao.insertOrUpdateMusicion(musician));
+                .forEach(musician -> dao.insertOrUpdateMusician(musician));
         dao.closeConnection();
     }
 }

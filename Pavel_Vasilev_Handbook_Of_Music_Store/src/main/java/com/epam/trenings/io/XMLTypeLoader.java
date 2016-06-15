@@ -1,9 +1,11 @@
 package com.epam.trenings.io;
 
+import com.epam.trenings.Utils;
 import com.epam.trenings.dao.XMLHandbookDAO;
 import com.epam.trenings.dao.factory.IAbstractFactoryDAO;
 import com.epam.trenings.dao.factory.XMLFactoryDAO;
 import com.epam.trenings.model.Handbook;
+import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -15,6 +17,7 @@ import java.io.File;
  */
 public class XMLTypeLoader implements IExportImport {
     private String path = "";
+    private static final Logger logger = Logger.getLogger(XMLTypeLoader.class);
 
     public XMLTypeLoader(String path) {
         this.path = path;
@@ -36,8 +39,7 @@ public class XMLTypeLoader implements IExportImport {
             Marshaller marshaller = context.createMarshaller();
             marshaller.marshal(handbookForExport, new File(path));
         } catch (JAXBException e) {
-            System.out.println("JAXBException catch when try save model to XML");
-            e.printStackTrace();
+            logger.error("JAXBException catch when try save model to XML", e);
         }
     }
 }

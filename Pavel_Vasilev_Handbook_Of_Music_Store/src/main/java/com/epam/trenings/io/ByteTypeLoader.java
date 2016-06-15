@@ -2,6 +2,7 @@ package com.epam.trenings.io;
 
 import com.epam.trenings.entities.EntityModel;
 import com.epam.trenings.model.Handbook;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
@@ -9,7 +10,8 @@ import java.io.*;
  * Created by pava0715 on 02.06.2016.
  */
 public class ByteTypeLoader implements IExportImport {
-    private String path="";
+    private static final Logger logger = Logger.getLogger(ByteTypeLoader.class);
+    private String path = "";
     private EntityModel entityModel = new EntityModel();
 
     public ByteTypeLoader(String path) {
@@ -27,14 +29,11 @@ public class ByteTypeLoader implements IExportImport {
 
             inputStream.close();
         } catch (FileNotFoundException fileNotFoundException) {
-            System.out.println("File " + path + " not found in root project directory.");
-            fileNotFoundException.printStackTrace();
+            logger.error("File " + path + " not found in root project directory.", fileNotFoundException);
         } catch (IOException exceptionIO) {
-            System.out.println("Input/output exception when try load object.");
-            exceptionIO.printStackTrace();
+            logger.error("Input/output exception when try load object.", exceptionIO);
         } catch (ClassNotFoundException classNotFoundException) {
-            System.out.println("Exceptiont when try convert loaded object.");
-            classNotFoundException.printStackTrace();
+            logger.error("Exceptiont when try convert loaded object.", classNotFoundException);
         }
         return newEntityModel.getHandbookFromEntity();
     }
@@ -51,11 +50,9 @@ public class ByteTypeLoader implements IExportImport {
             outputStream.flush();
             outputStream.close();
         } catch (FileNotFoundException fileNotFoundException) {
-            System.out.println("File " + path + " not found in root project directory.");
-            fileNotFoundException.printStackTrace();
+            logger.error("File " + path + " not found in root project directory.", fileNotFoundException);
         } catch (IOException exceptionIO) {
-            System.out.println("Input/output exception when try load object.");
-            exceptionIO.printStackTrace();
+            logger.error("Input/output exception when try load object.", exceptionIO);
         }
     }
 }

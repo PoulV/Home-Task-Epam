@@ -1,5 +1,6 @@
 package com.epam.trenings.dao;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.Transformer;
@@ -13,6 +14,7 @@ import java.io.File;
  * Created by Pol on 6/12/2016.
  */
 public class XMLUtils {
+    private static final Logger logger = Logger.getLogger(XMLUtils.class);
     public static final String PARAM_ID = "id";
     public static final String PARAM_NAME = "name";
     public static final String PARAM_GENRE = "genre";
@@ -36,8 +38,7 @@ public class XMLUtils {
             StreamResult result = new StreamResult(new File(path));
             transformer.transform(source, result);
         } catch (TransformerException e) {
-            System.out.println("Exception executed when try write DOM document to xml file");
-            e.printStackTrace();
+            logger.error("Exception executed when try write DOM document to xml file", e);
         }
     }
 }

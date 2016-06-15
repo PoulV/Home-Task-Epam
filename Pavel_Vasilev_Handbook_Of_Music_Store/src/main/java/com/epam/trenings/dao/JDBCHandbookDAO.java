@@ -5,6 +5,7 @@ import com.epam.trenings.model.Album;
 import com.epam.trenings.model.Composition;
 import com.epam.trenings.model.INamed;
 import com.epam.trenings.model.Musician;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -18,6 +19,8 @@ import static com.epam.trenings.dao.SQLQueries.*;
  * Created by Pol on 6/12/2016.
  */
 public class JDBCHandbookDAO implements IHandbookDAO {
+    private static final Logger logger = Logger.getLogger(JDBCHandbookDAO.class);
+
     private List<Album> totalAlbumList = new LinkedList<>();
     private List<Composition> totalSongList = new LinkedList<>();
     private List<Musician> totalMusicianList = new LinkedList<>();
@@ -33,7 +36,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
             properties.setProperty("ssl", "false");
 
             connection = DriverManager.getConnection(urlForConnection, properties);
-            System.out.println("Successful connect to db");
+            logger.info("Successful connect to db");
         } catch (SQLException e) {
             printSQLException("SQLException executed when try connect to db", e);
         }
@@ -104,7 +107,7 @@ public class JDBCHandbookDAO implements IHandbookDAO {
     public void closeConnection() {
         try {
             connection.close();
-            System.out.println("Connection successfully closed");
+            logger.info("Connection successfully closed");
         } catch (SQLException e) {
             printSQLException("SQLException executed when try close JDBC connection", e);
         }

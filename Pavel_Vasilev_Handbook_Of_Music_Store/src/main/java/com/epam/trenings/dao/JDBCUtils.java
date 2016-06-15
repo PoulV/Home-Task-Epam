@@ -3,6 +3,7 @@ package com.epam.trenings.dao;
 import com.epam.trenings.model.Album;
 import com.epam.trenings.model.Composition;
 import com.epam.trenings.model.Musician;
+import org.apache.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,18 +14,17 @@ import static com.epam.trenings.dao.SQLQueries.*;
  * Created by 1 on 13.06.2016.
  */
 public class JDBCUtils {
-
+    private static final Logger logger = Logger.getLogger(JDBCUtils.class);
 
     public static void printSQLException(String comment, SQLException e) {
-        System.out.println(comment);
-        e.printStackTrace(System.out);
-        System.out.println("SQLState: " + e.getSQLState());
-        System.out.println("Error Code: " + e.getErrorCode());
-        System.out.println("Message: " + e.getMessage());
+        logger.error(comment, e);
+        logger.error("SQLState: " + e.getSQLState());
+        logger.error("Error Code: " + e.getErrorCode());
+        logger.error("Message: " + e.getMessage());
 
         Throwable t = e.getCause();
         while (t != null) {
-            System.out.println("Cause: " + t);
+            logger.error("Cause: " + t);
             t = t.getCause();
         }
     }

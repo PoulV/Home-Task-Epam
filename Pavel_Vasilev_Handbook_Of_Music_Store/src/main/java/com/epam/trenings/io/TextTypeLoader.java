@@ -4,6 +4,7 @@ import com.epam.trenings.model.Album;
 import com.epam.trenings.model.Composition;
 import com.epam.trenings.model.Handbook;
 import com.epam.trenings.model.Musician;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import static com.epam.trenings.Utils.*;
  * Created by pava0715 on 01.06.2016.
  */
 public class TextTypeLoader implements IExportImport {
+    private static final Logger logger = Logger.getLogger(TextTypeLoader.class);
     private String path = "";
 
     public TextTypeLoader(String path) {
@@ -61,11 +63,9 @@ public class TextTypeLoader implements IExportImport {
             }
             reader.close();
         } catch (FileNotFoundException fileNotFoundException) {
-            System.out.println("File " + path + " not found in root project directory.");
-            fileNotFoundException.printStackTrace();
+            logger.error("File " + path + " not found in root project directory.", fileNotFoundException);
         } catch (IOException exceptionIO) {
-            System.out.println("Input/output exception when try load object.");
-            exceptionIO.printStackTrace();
+            logger.error("Input/output exception when try load object.", exceptionIO);
         }
         return resultHandbook;
     }
@@ -89,11 +89,9 @@ public class TextTypeLoader implements IExportImport {
             bufferedWriter.flush();
             bufferedWriter.close();
         } catch (FileNotFoundException fileNotFoundException) {
-            System.out.println("File " + path + " not found in root project directory.");
-            fileNotFoundException.printStackTrace();
+            logger.error("File " + path + " not found in root project directory.", fileNotFoundException);
         } catch (IOException exceptionIO) {
-            System.out.println("Input/output exception when try load object.");
-            exceptionIO.printStackTrace();
+            logger.error("Input/output exception when try load object.", exceptionIO);
         }
     }
 }

@@ -2,6 +2,8 @@ package com.epam.trenings;
 
 import com.epam.trenings.io.IExportImport;
 import com.epam.trenings.model.*;
+import org.apache.log4j.Logger;
+
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -13,6 +15,8 @@ import java.util.*;
  * Created by Pol on 6/6/2016.
  */
 public class Utils {
+    private static final Logger logger = Logger.getLogger(Utils.class);
+
     public static final String TYPE_NAME_SEPARATOR = ": ";
     public static final String FIELD_VALUE_SEPARATOR = " = ";
     public static final String FIELD_SEPARATOR = ", ";
@@ -33,7 +37,7 @@ public class Utils {
 
 
     public static void printHandbook(String header, Handbook handbookForPrint) {
-        System.out.println(header);
+        logger.info(header);
 
         StringBuffer handbookAsText = new StringBuffer();
 
@@ -46,7 +50,7 @@ public class Utils {
                 }
             }
         }
-        System.out.println(handbookAsText.toString());
+        logger.info(handbookAsText.toString());
     }
 
     public static void getStringFromNamed(Appendable buffer, INamed namedForWrite) {
@@ -76,8 +80,7 @@ public class Utils {
                     break;
             }
         } catch (IOException e) {
-            System.out.println("Input/output exception when create Named as string");
-            e.printStackTrace();
+            logger.error("Input/output exception when create Named as string", e);
         }
     }
 
@@ -86,8 +89,7 @@ public class Utils {
             buffer.append(ID).append(FIELD_VALUE_SEPARATOR).append(named.getId().toString()).append(FIELD_SEPARATOR).
                     append(NAME).append(FIELD_VALUE_SEPARATOR).append(named.getName()).append(end);
         } catch (IOException e) {
-            System.out.println("Input/output exception when create Named as string");
-            e.printStackTrace();
+            logger.error("Input/output exception when create Named as string", e);
         }
     }
 
@@ -95,8 +97,7 @@ public class Utils {
         try {
             buffer.append(propertyName).append(FIELD_VALUE_SEPARATOR).append(propertyValue).append(end);
         } catch (IOException e) {
-            System.out.println("Input/output exception when create Named as string");
-            e.printStackTrace();
+            logger.error("Input/output exception when create Named as string", e);
         }
     }
 
@@ -170,17 +171,6 @@ public class Utils {
         }
     }
 
-    public static <NAMED extends INamed> NAMED getByName(List<NAMED> inputList, String name) {
-        NAMED namedObjectForReturn = null;
-        for (NAMED namedObject : inputList) {
-            if (namedObject.getName().equals(name)) {
-                namedObjectForReturn = namedObject;
-                break;
-            }
-        }
-        return namedObjectForReturn;
-    }
-
     public static Handbook getFilledHandbook() {
         Handbook handbookForReturn = new Handbook();
 
@@ -213,18 +203,11 @@ public class Utils {
         return handbookForReturn;
     }
 
-    public static Integer[] getIdFromObject(INamed... inputObjects) {
-        Integer[] resultArrayOfID = new Integer[inputObjects.length];
-        for (int i = 0; i < inputObjects.length; i++) {
-            resultArrayOfID[i] = inputObjects[i].getId();
-        }
-        return resultArrayOfID;
-    }
 
     public static void presentLoadedHandbook(Handbook handbook, IExportImport loader) {
         loader.save(handbook);
         Handbook resultHandBook = loader.load();
-        Utils.printHandbook("Downloaded by " + loader.getClass().getSimpleName() + ":", resultHandBook);
+        printHandbook("Downloaded by " + loader.getClass().getSimpleName() + ":", resultHandBook);
     }
 
     public static String getTypeFromTextView(String inputLine) {
@@ -248,32 +231,9 @@ public class Utils {
         return objectWithIdForReturn;
     }
 
-
     public static void clearLists(List<?>... lists) {
         for (List<?> currentList : lists) {
             currentList.clear();
         }
     }
-
-
-  /*  public static Integer[] stringAsArrayID(String stringWithID) {
-        String[] tempStringArray = stringWithID.split(ID_SEPARATOR);
-        Integer[] resultArrayOfID = new Integer[tempStringArray.length];
-
-        for (int i = 0; i < tempStringArray.length; i++) {
-            resultArrayOfID[i] = Integer.parseInt(tempStringArray[i]);
-        }
-
-        return resultArrayOfID;
-    }
-
-    public static String putID(String stringWithID, Integer... newID) {
-        Set<Integer> setOfId = new HashSet<>();
-        for (String stringID : stringWithID.split(ID_SEPARATOR)) {
-            setOfId.add(Integer.parseInt(stringID));
-        }
-
-
-    }*/
-
 }

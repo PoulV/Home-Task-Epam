@@ -4,6 +4,7 @@ import com.epam.trenings.Utils;
 import com.epam.trenings.model.Album;
 import com.epam.trenings.model.Composition;
 import com.epam.trenings.model.Musician;
+import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -22,6 +23,7 @@ import static com.epam.trenings.dao.XMLUtils.*;
  * Created by Pol on 6/12/2016.
  */
 public class XMLHandbookDAO implements IHandbookDAO {
+    private static final Logger logger = Logger.getLogger(XMLHandbookDAO.class);
     private String path;
     private Document doc;
     private List<Album> totalAlbumList = new LinkedList<>();
@@ -36,14 +38,11 @@ public class XMLHandbookDAO implements IHandbookDAO {
             doc = dBuilder.parse(new File(path));
             doc.getDocumentElement().normalize();
         } catch (SAXException e) {
-            System.out.println("SAXException executed when try parse xml file");
-            e.printStackTrace();
+            logger.error("SAXException executed when try parse xml file", e);
         } catch (IOException e) {
-            System.out.println("IOException executed when try read xml file");
-            e.printStackTrace();
+            logger.error("IOException executed when try read xml file", e);
         } catch (ParserConfigurationException e) {
-            System.out.println("ParserConfigurationException executed when try parse xml file");
-            e.printStackTrace();
+            logger.error("ParserConfigurationException executed when try parse xml file", e);
         }
     }
 

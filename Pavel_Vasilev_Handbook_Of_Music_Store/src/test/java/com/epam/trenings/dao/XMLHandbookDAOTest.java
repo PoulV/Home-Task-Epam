@@ -1,6 +1,5 @@
-package com.epam.trenings.junit_tests;
+package com.epam.trenings.dao;
 
-import com.epam.trenings.dao.XMLHandbookDAO;
 import com.epam.trenings.dao.factory.IAbstractFactoryDAO;
 import com.epam.trenings.dao.factory.XMLFactoryDAO;
 import com.epam.trenings.io.XMLTypeLoader;
@@ -10,6 +9,7 @@ import com.epam.trenings.model.Handbook;
 import com.epam.trenings.model.Musician;
 import org.apache.log4j.Logger;
 import org.junit.*;
+
 
 import java.util.List;
 

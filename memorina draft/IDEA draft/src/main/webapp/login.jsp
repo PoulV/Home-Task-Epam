@@ -19,7 +19,7 @@
 
 		<fieldset class="boxBody">
 
-			<form:label path="name">Name:</form:label>
+			<form:label path="name">_Name:</form:label>
 			<form:input path="name" />
 
 			<form:label path="password">Password:</form:label>

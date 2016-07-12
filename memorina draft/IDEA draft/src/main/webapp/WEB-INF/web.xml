@@ -23,6 +23,6 @@
     </servlet-mapping>
 
     <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        <listener-class>com.epam.trainings.MyAppServletContextListener</listener-class>
     </listener>
 </web-app>

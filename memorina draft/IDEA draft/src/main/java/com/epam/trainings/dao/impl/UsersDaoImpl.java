@@ -16,7 +16,6 @@ import static org.hibernate.criterion.Restrictions.*;
  * Created by 1 on 11.07.2016.
  */
 @SuppressWarnings("unchecked")
-@Repository
 public class UsersDaoImpl extends AbstractHibernateDAO<Users> implements UsersDao {
     public UsersDaoImpl(Class<Users> entityClass) {
         super(entityClass);

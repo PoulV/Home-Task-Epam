@@ -36,7 +36,7 @@ public class LoginDAOImpl implements LoginDAO {
         Session session = sessionFactory.openSession();
         boolean userFound = false;
         //Query using Hibernate Query Language
-        String SQL_QUERY = " from Users as o where o.userName=? and o.userPassword=?";
+        String SQL_QUERY = " from Users as o where o.login=? and o.password=?";
         Query query = session.createQuery(SQL_QUERY);
         query.setParameter(0, userName);
         query.setParameter(1, userPassword);

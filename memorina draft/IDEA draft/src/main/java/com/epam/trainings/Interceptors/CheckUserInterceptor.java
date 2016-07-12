@@ -8,9 +8,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 /**
- * Created by Pol on 7/12/2016.
+ * Created by 1 on 12.07.2016.
  */
 public class CheckUserInterceptor extends HandlerInterceptorAdapter {
     @Autowired
@@ -23,9 +22,17 @@ public class CheckUserInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         if (request.getRequestURI().contains("check-user")) {
-            SimpleUserParams userParams = (SimpleUserParams) request.getAttribute("user");
 
-            if (loginService.checkLogin(userParams.getName(), userParams.getPassword())) {
+
+
+
+
+
+            SimpleUserParams userParams = (SimpleUserParams) modelAndView.getModel().get("user");
+            String login = userParams.getName();
+            String password = userParams.getPassword();
+
+            if (loginService.checkLogin(login, password)) {
                 response.sendRedirect(request.getContextPath() + "/login");
             }
 

@@ -91,6 +91,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${org.springframework-version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.webflow</groupId>
             <artifactId>org.springframework.webflow</artifactId>
             <version>RELEASE</version>

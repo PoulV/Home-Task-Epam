@@ -22,7 +22,49 @@
 
     <mvc:view-controller path="/" view-name="login" />
 
-    <context:component-scan base-package="com.epam.trainings"/>
+    <context:component-scan base-package="com.epam.trainings."/>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/*"/>
+            <bean class="com.epam.trainings.Interceptors.CheckUserInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <bean id="dataSourceTarget" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${database.driver}" />
+        <property name="url" value="${DB_URL}"/>
+        <property name="username" value="${DB_USER}"/>
+        <property name="password" value="${DB_PASSWORD}"/>
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.epam.trainings"/>
+        <property name="namingStrategy" ref="namingStrategy"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">${database.dialect}</prop>
+                <prop key="hibernate.show_sql">${database.show_sql}</prop>
+                <prop key="hibernate.format_sql">${database.format_sql}</prop>
+                <prop key="hibernate.hdm2ddl.auto">${database.hibernate_hdm2ddl_auto}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="namingStrategy" class="org.hibernate.cfg.ImprovedNamingStrategy"/>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
+        <property name="targetDataSource" ref="dataSourceTarget"/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+
+    <bean class="com.epam.trainings.model.Users"/>
 
 
 </beans>

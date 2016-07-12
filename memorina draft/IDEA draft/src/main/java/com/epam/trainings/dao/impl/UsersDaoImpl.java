@@ -1,5 +1,6 @@
 package com.epam.trainings.dao.impl;
 
+import com.epam.trainings.dao.UsersDao;
 import com.epam.trainings.model.Users;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
@@ -16,11 +17,12 @@ import static org.hibernate.criterion.Restrictions.*;
  */
 @SuppressWarnings("unchecked")
 @Repository
-public class UsersDaoImpl extends AbstractHibernateDAO<Users>{
+public class UsersDaoImpl extends AbstractHibernateDAO<Users> implements UsersDao {
     public UsersDaoImpl(Class<Users> entityClass) {
         super(entityClass);
     }
 
+    @Override
     public Users getByLogPass(String login, String password) {
         Map<String, String> properties = new LinkedHashMap<>();
         properties.put("login", login);

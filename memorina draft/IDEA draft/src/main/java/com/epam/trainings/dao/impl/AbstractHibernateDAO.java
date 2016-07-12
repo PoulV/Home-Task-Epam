@@ -32,8 +32,8 @@ public class AbstractHibernateDAO<ENTERED_TYPE> implements BasicCrudDao<ENTERED_
     protected final Class<ENTERED_TYPE> entityClass;
     @Autowired
     SessionFactory sessionFactory;
-    @Autowired
-    ImprovedNamingStrategy improvedNamingStrategy;
+    /*@Autowired
+    ImprovedNamingStrategy improvedNamingStrategy;*/
 
     public AbstractHibernateDAO(Class<ENTERED_TYPE> entityClass) {
         notNull(entityClass, "entityClass must not be null");

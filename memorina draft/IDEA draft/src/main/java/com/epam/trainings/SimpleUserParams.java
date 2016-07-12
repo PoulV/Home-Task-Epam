@@ -3,7 +3,7 @@ package com.epam.trainings;
 /**
  * Created by 1 on 10.07.2016.
  */
-public class User {
+public class SimpleUserParams {
     private String name;
     private String password;
 

@@ -1,8 +1,10 @@
 package com.epam.trainings.controller;
 
-import com.epam.trainings.User;
+import com.epam.trainings.SimpleUserParams;
 import com.epam.trainings.model.Users;
+import com.epam.trainings.servicies.LoginService;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,15 +23,23 @@ import javax.servlet.http.HttpSession;
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
+    @Autowired
+    private LoginService loginService;
+
+    public void setLoginService(LoginService loginService) {
+        this.loginService = loginService;
+    }
+
+
     @RequestMapping(value="/", method= RequestMethod.GET)
     public ModelAndView main(HttpSession session) {
         WebApplicationContext context = WebApplicationContextUtils.
                 getWebApplicationContext(session.getServletContext());
-        return new ModelAndView("login", "user", new Users());
+        return new ModelAndView("login", "user", new SimpleUserParams());
     }
 
     @RequestMapping(value="/check-user", method=RequestMethod.POST)
-    public ModelAndView checkUser(@ModelAttribute("user") Users user) {
+    public ModelAndView checkUser(@ModelAttribute("user") SimpleUserParams user) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("main");
 
